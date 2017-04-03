@@ -1,0 +1,13 @@
+<section class="viewer"
+         [class.x]="isX(img)"
+         [class.y]="!isX(img)"
+         [class.tiny]="isTiny(img)"
+         [class.huge]="isHuge(img)">
+  <img *ngIf="img?.src"
+       [src]="img?.src | trustResourceUrl"
+       [style.maxHeight.%]="scale"
+       [style.maxWidth.%]="scale"
+       (load)="onLoad($event)"
+  >
+</section>
+<!--<div style="color: white;">{{img?.src}}</div>-->

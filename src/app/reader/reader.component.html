@@ -1,0 +1,11 @@
+<viewer
+  *ngFor="img in book.pages(_)"
+  [img]="img"
+  [scale]="scale"
+  (click)="next()">
+</viewer>
+<section class="layer">
+  <section class="panel progress">
+    {{book?.curNum}} / {{book?.totalNum}}
+  </section>
+</section>
