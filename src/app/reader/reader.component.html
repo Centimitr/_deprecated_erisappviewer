@@ -1,11 +1,23 @@
-<viewer
-  *ngFor="img in book.pages(_)"
-  [img]="img"
-  [scale]="scale"
-  (click)="next()">
-</viewer>
+<!--<viewer-->
+<!--*ngFor="img in book.pages(_)"-->
+<!--[img]="img"-->
+<!--[scale]="scale"-->
+<!--(click)="next()">-->
+<!--</viewer>-->
+<section class="pages">
+  <viewer *ngFor="let p of book?.meta?.Pages; let i = index;"
+          [class]="i"
+          [page]="i+1"
+          [cache]="true"
+          [path]="book?.getPageFilePath(p.Id)"
+          [meta]="p"
+          (click)="book?.next()">
+  </viewer>
+  <!--[cache]="inCacheRange(recorder.stack, i)"-->
+  <!--[hidden]="i!==book?.current-1"-->
+</section>
 <section class="layer">
   <section class="panel progress">
-    {{book?.curNum}} / {{book?.totalNum}}
+    {{book?.current}} / {{book?.total}}
   </section>
 </section>

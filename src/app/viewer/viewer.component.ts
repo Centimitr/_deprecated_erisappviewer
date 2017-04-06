@@ -1,8 +1,23 @@
 import {Component, OnInit, Input, OnChanges} from '@angular/core';
-import {ImageMeta} from '../book/book';
+import {PageMeta} from "../reader/meta";
 const getWindowSize = () => {
   return [window.innerWidth, window.innerHeight];
 };
+class ClassNames {
+  names: string[] = [];
+
+  get(): string[] {
+    return this.names;
+  }
+
+  clear() {
+    this.names = [];
+  }
+
+  add(c: string) {
+    this.names.push(c);
+  }
+}
 
 @Component({
   selector: 'viewer',
@@ -10,9 +25,13 @@ const getWindowSize = () => {
   styleUrls: ['./viewer.component.css']
 })
 export class ViewerComponent implements OnInit, OnChanges {
-
-  @Input() img: ImageMeta;
+  @Input() path: string;
+  @Input() meta: PageMeta;
+  @Input() page: number;
   @Input() scale: number;
+  @Input() cache: boolean;
+  show: boolean = false;
+  classNames: ClassNames = new ClassNames();
 
   constructor() {
   }
@@ -21,40 +40,46 @@ export class ViewerComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes) {
-    if (changes.img || changes.scale) {
+    if (changes.path || changes.scale) {
       // console.timeEnd('overall');
     }
   }
 
-  isX(img?: ImageMeta) {
-    if (img) {
-      const [w, h] = getWindowSize();
-      return img.aspect > w / h;
-    }
+  // isX(img?: HTMLImageElement) {
+  //   if (img) {
+  //     const [w, h] = getWindowSize();
+  //     return img.width / img.height > w / h;
+  //   }
+  // }
+
+  //
+  // isTiny(img?: ImageMeta) {
+  //   if (img) {
+  //     const [w, h] = getWindowSize();
+  //     return this.scale < 100 || (img.width < w && img.height < h);
+  //   }
+  // }
+  //
+  // isHuge(img?: ImageMeta) {
+  //   if (img) {
+  //     const [w, h] = getWindowSize();
+  //     const ratio = this.scale / 100;
+  //     return img.width * ratio > w && img.height * ratio > h;
+  //   }
+  // }
+
+  // max(img?: ImageMeta) {
+  //   return this.isTiny(img) ? 100 : this.scale;
+  // }
+  //
+  onLoad(e, img) {
+    this.refresh(img);
   }
 
-  isTiny(img?: ImageMeta) {
-    if (img) {
-      const [w, h] = getWindowSize();
-      return this.scale < 100 || (img.width < w && img.height < h);
-    }
-  }
-
-  isHuge(img?: ImageMeta) {
-    if (img) {
-      const [w, h] = getWindowSize();
-      const ratio = this.scale / 100;
-      return img.width * ratio > w && img.height * ratio > h;
-    }
-  }
-
-  max(img?: ImageMeta) {
-    return this.isTiny(img) ? 100 : this.scale;
-  }
-
-  onLoad(e) {
-    // console.log(e);
-    // console.timeEnd('image load');
+  refresh(img) {
+    // console.table([{'width': img.width, 'height': img.height}]);
+    this.classNames.add('y');
+    this.show = true;
   }
 
 }

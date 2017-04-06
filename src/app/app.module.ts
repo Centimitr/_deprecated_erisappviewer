@@ -5,8 +5,6 @@ import {HttpModule} from '@angular/http';
 
 import {AppComponent} from './app.component';
 import {ViewerComponent} from './viewer/viewer.component';
-import {FileSystemService} from './fs.service';
-import {BookService} from './book/book.service';
 import {TrustResourceUrlPipe} from './trust-resource-url.pipe';
 import {ReaderComponent} from './reader/reader.component';
 
@@ -22,10 +20,7 @@ import {ReaderComponent} from './reader/reader.component';
     FormsModule,
     HttpModule
   ],
-  providers: [
-    FileSystemService,
-    BookService,
-  ],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule {
