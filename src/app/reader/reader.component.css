@@ -20,11 +20,17 @@ section.pages {
   display: flex;
   flex-flow: column nowrap;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: scroll;
+  overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 viewer {
   width: 100%;
+}
+
+viewer + viewer {
+  margin-top: 3vh;
 }
 
 .layer {

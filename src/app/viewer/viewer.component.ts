@@ -1,4 +1,4 @@
-import {Component, OnInit, Input, OnChanges} from '@angular/core';
+import {Component, OnInit, Input, OnChanges, ElementRef} from '@angular/core';
 import {PageMeta} from "../reader/meta";
 const getWindowSize = () => {
   return [window.innerWidth, window.innerHeight];
@@ -28,12 +28,14 @@ export class ViewerComponent implements OnInit, OnChanges {
   @Input() path: string;
   @Input() meta: PageMeta;
   @Input() page: number;
-  @Input() scale: number;
+  @Input() height: number;
   @Input() cache: boolean;
   show: boolean = false;
   classNames: ClassNames = new ClassNames();
+  elm: any;
 
-  constructor() {
+  constructor(elm: ElementRef) {
+    this.elm = elm.nativeElement;
   }
 
   async ngOnInit() {

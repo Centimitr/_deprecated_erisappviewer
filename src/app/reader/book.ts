@@ -7,9 +7,15 @@ export class Book {
   _current: number;
   total: number;
   _onPage: Function[] = [];
+  _viewers: HTMLElement[];
 
   constructor(path: string) {
     this.locator = path;
+  }
+
+  bind(elms: HTMLElement[]) {
+    this._viewers = elms;
+    console.log(this._viewers);
   }
 
   get current(): number {
@@ -24,34 +30,58 @@ export class Book {
 
   async init() {
     await args.wait();
-    const url = `http://localhost:${args.port}/book?locator=${this.locator}`;
-    const data = await fetch(url);
+    const url = new URL(`http://localhost:${args.port}/book`);
+    console.log(url);
+    url['searchParams'].append('locator', this.locator);
+    const data = await fetch(url.href);
     this.meta = await data.json();
-    if (!this.meta.Pages){
+    if (!this.meta.Pages) {
       throw new Error('no pages');
     }
     this.total = this.meta.Pages.length;
     this.current = 1;
   }
 
-  goto(pageOrOffset: number, relative: boolean = false): boolean {
-    const page = relative ? this.current + pageOrOffset : pageOrOffset;
+  private checkPage(page: number) {
     if (page > 0 && page <= this.total) {
-      this.current = page;
       return true;
     }
   }
 
-  prev(): boolean {
-    return this.goto(-1, true);
+  updateCurrent(page: number): boolean {
+    const ok = this.checkPage(page);
+    if (ok) {
+      this.current = page;
+    }
+    return ok;
   }
 
-  next(): boolean {
-    return this.goto(1, true);
+  go(pageOrOffset: number, relative: boolean = false): boolean {
+    const page = relative ? this.current + pageOrOffset : pageOrOffset;
+    const ok = this.checkPage(page);
+    if (ok) {
+      const viewer = this._viewers[page - 1];
+      viewer.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+    return ok;
+  }
+
+  prev(page?: number): boolean {
+    return this.go((page || 0) - 1, !page);
+  }
+
+  next(page?: number): boolean {
+    return this.go((page || 0) + 1, !page);
   }
 
   getPageFilePath(id: string) {
-    return `http://localhost:${args.port}/book/page?locator=${this.locator}&page=${id}`;
+    const url = new URL(`http://localhost:${args.port}/book/page`);
+    url['searchParams'].append('locator', this.locator);
+    url['searchParams'].append('page', id);
+    return url.href;
   }
 
   onPage(callback: (n?: number, old?: number) => void) {

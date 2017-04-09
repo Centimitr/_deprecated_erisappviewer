@@ -1,5 +1,8 @@
 <section class="viewer"
          [class]="classNames.get()"
+         [style.Height.px]="height"
+         [style.minHeight.px]="height"
+         [style.maxHeight.px]="height"
 >
   <!--[class.y]="!isX(img)"-->
   <!--[class.tiny]="isTiny(img)"-->
@@ -9,9 +12,7 @@
   <!--[style.maxWidth.%]="scale"-->
   <!--[style.border]="'1px solid purple'"-->
   <div class="loading"
-       [style.width.px]="meta.Width"
-       [style.height.px]="meta.Height"
-       *ngIf="!show">
+       [hidden]="show">
     <div class="words">
       <div class="page">Page {{page}}</div>
       <!--<div class="status">{{meta.Type}}: {{meta.Width}}-{{meta.Height}}</div>-->
@@ -19,9 +20,10 @@
     </div>
   </div>
   <img #img [src]="path"
-  *ngIf="cache"
-  [hidden]="!show"
-  (load)="onLoad($event, img)">
+       [style.maxHeight.px]="height"
+       *ngIf="cache"
+       [hidden]="!show"
+       (load)="onLoad($event, img)">
 </section>
 <!--[style.maxHeight.vh]="100"-->
 <!--<div style="color: white;">{{img?.src}}</div>-->

@@ -4,20 +4,22 @@
 <!--[scale]="scale"-->
 <!--(click)="next()">-->
 <!--</viewer>-->
-<section class="pages">
-  <viewer *ngFor="let p of book?.meta?.Pages; let i = index;"
+<section class="pages" #pages>
+  <viewer #page *ngFor="let p of book?.meta?.Pages; let i = index;"
+          [height]="getPageHeight(p, pages)"
+          [id]="'page-'+(i+1)"
           [class]="i"
           [page]="i+1"
           [cache]="true"
           [path]="book?.getPageFilePath(p.Id)"
           [meta]="p"
-          (click)="book?.next()">
+          (click)="book?.next(i+1)">
   </viewer>
   <!--[cache]="inCacheRange(recorder.stack, i)"-->
   <!--[hidden]="i!==book?.current-1"-->
 </section>
 <section class="layer">
-  <section class="panel progress">
+  <section class="panel progress" *ngIf="book?.total">
     {{book?.current}} / {{book?.total}}
   </section>
 </section>

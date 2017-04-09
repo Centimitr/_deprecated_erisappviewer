@@ -12,14 +12,22 @@ export class IntervalTimer {
     if ((now - this.lastRunTime) > delay) {
       this.lastRunTime = now;
       callback();
+      this.timer = null;
     } else {
       if (this.timer) {
         clearTimeout(this.timer);
+        this.timer = null;
       }
       this.timer = setTimeout(() => {
         this.lastRunTime = now;
         callback();
       }, delay - (now - this.lastRunTime));
+    }
+  }
+
+  whenFree(callback: Function) {
+    if (!this.timer) {
+      callback();
     }
   }
 }
@@ -60,6 +68,23 @@ export class Dismiss {
     if (this.times > 0) {
       this.times--;
     } else {
+      cb();
+    }
+  }
+}
+
+export class RustyLock {
+  finishTime: number;
+
+  constructor() {
+  }
+
+  lock(interval: number) {
+    this.finishTime = Date.now() + interval;
+  }
+
+  run(cb: Function) {
+    if (Date.now() > this.finishTime) {
       cb();
     }
   }

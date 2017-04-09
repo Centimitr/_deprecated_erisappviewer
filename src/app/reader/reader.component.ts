@@ -1,7 +1,9 @@
-import {Component, OnInit, Input, HostListener, NgZone, OnChanges} from '@angular/core';
+import {Component, OnInit, Input, HostListener, NgZone, OnChanges, ViewChildren, QueryList} from '@angular/core';
 import {setTouchBar, TouchBarButton, TouchBarSlider} from "../lib/touchbar";
-import {Dismiss, EnterLeaveRecorder, IntervalTimer} from "../lib/util";
+import {Dismiss, EnterLeaveRecorder, IntervalTimer, RustyLock} from "../lib/util";
 import {Book} from "./book";
+import {PageMeta} from "./meta";
+import {ViewerComponent} from "../viewer/viewer.component";
 const fs = window['require']('fs');
 
 @Component({
@@ -13,8 +15,10 @@ export class ReaderComponent implements OnInit, OnChanges {
 
   @Input() path: string;
   book: Book;
-  scale: number = 100;
+  scale: number = 70;
   recorder: EnterLeaveRecorder;
+
+  @ViewChildren(ViewerComponent) viewers: QueryList<ViewerComponent>;
 
   // todo: multi-viewer: cache and better loading
 
@@ -35,43 +39,59 @@ export class ReaderComponent implements OnInit, OnChanges {
     if (changes.path && this.path) {
       this.book = new Book(this.path);
       await this.book.init();
+      // this.book.bind(this.viewers._result.map(viewer => viewer.elm));
+      this.viewers.changes.subscribe(() => {
+        this.book.bind(this.viewers.map(viewer => viewer.elm));
+      });
 
-      //
+      // intersection
       if (this.recorder) {
         this.recorder.io.disconnect();
       }
       this.recorder = new EnterLeaveRecorder((entries) => {
         const top = +entries.map(e => this.recorder.toggle('' + (+e.target.className + 1))).pop();
-        this.zone.run(() => this.book.goto(top));
-      }, {threshold: [0.5]});
+        this.zone.run(() => this.book.updateCurrent(top));
+      }, {threshold: [0.6]});
       setTimeout(() => {
-        Array.prototype.slice.call(document.querySelectorAll('viewer')).forEach(node => this.recorder.io.observe(node));
+        this.viewers.forEach(viewer => this.recorder.io.observe(viewer.elm));
+        // Array.prototype.slice.call(document.querySelectorAll('viewer')).forEach(node => this.recorder.io.observe(node));
+        // Array.prototype.slice.call(document.querySelectorAll('viewer')).forEach(node => this.recorder.io.observe(node));
       }, 0);
       // touchBar
       const getProgressStr = (current: number = this.book.current) => current + '/' + this.book.total;
-      const getRealVal = (selectedVal: number) => this.book.total > 100 ? selectedVal : Math.max(1, Math.round(this.book.total * selectedVal / 100));
-      const getSelectedVal = (current: number = this.book.current) => this.book.total > 100 ? current : Math.ceil(current / this.book.total * 100);
-      const slideTimer = new IntervalTimer();
+      // const getRealVal = (selectedVal: number) => this.book.total > 100 ? selectedVal : Math.max(1, Math.round(this.book.total * selectedVal / 100));
+      // const getSelectedVal = (current: number = this.book.current) => this.book.total > 100 ? current : Math.ceil(current / this.book.total * 100);
+      // const slideTimer = new IntervalTimer();
+      const lock = new RustyLock();
       const slider = new TouchBarSlider({
         label: getProgressStr(),
-        value: getSelectedVal(),
+        value: this.book.current,
         minValue: 1,
-        maxValue: Math.max(100, this.book.total),
-        change: (newValue: number) => {
-          const current = getRealVal(newValue);
+        maxValue: this.book.total,
+        // maxValue: Math.max(100, this.book.total),
+        change: (current: number) => {
+          // const current = getRealVal(newValue);
           slider.label = getProgressStr(current);
-          slideTimer.run(() => this.zone.run(() => this.book.current = current), 75);
+          // slideTimer.run(() => this.zone.run(() => this.book.go(current)), 75);
+          this.zone.run(() => this.book.go(current));
+          lock.lock(175);
         }
       });
       this.book.onPage((current) => {
-        slider.value = getSelectedVal(current);
-        slider.label = getProgressStr(current);
+        // slideTimer.whenFree(() => {
+        lock.run(() => {
+          slider.value = current;
+          // slider.value = getSelectedVal(current);
+          slider.label = getProgressStr(current);
+        })
       });
+      // });
       setTouchBar([
-        new TouchBarButton({label: 'Front', click: () => this.zone.run(() => this.book.goto(1))}),
+        new TouchBarButton({label: 'Open', backgroundColor: '#007eff', click: () => this.zoom(0)}),
+        new TouchBarButton({label: 'Page 1', click: () => this.zone.run(() => this.book.go(1))}),
         slider,
-        new TouchBarButton({label: 'ZoomIn', click: () => this.zoom(-10)}),
-        new TouchBarButton({label: 'ZoomOut', click: () => this.zoom(10)}),
+        new TouchBarButton({label: 'Zoom', click: () => this.zoom(10)}),
+        // new TouchBarButton({label: 'ZoomOut', click: () => this.zoom(10)}),
       ]);
     }
   }
@@ -126,6 +146,14 @@ export class ReaderComponent implements OnInit, OnChanges {
     const BACKWARD = 2;
     const FORWARD = 5;
     return -1 * BACKWARD <= distance && distance <= FORWARD;
+  }
+
+  getPageHeight(p: PageMeta, pages: HTMLElement) {
+    const xScale = 100;
+    const yScale = this.scale;
+    const [w, h] = [xScale / 100 * pages.offsetWidth, yScale / 100 * pages.offsetHeight];
+    const scale = Math.min(1, w / p.Width, h / p.Height);
+    return p.Height * scale;
   }
 
   // @HostListener('window:mousewheel', ['$event'])
