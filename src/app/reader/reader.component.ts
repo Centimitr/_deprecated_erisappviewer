@@ -15,7 +15,7 @@ export class ReaderComponent implements OnInit, OnChanges {
 
   @Input() path: string;
   book: Book;
-  scale: number = 70;
+  scale: number = 133;
   recorder: EnterLeaveRecorder;
 
   @ViewChildren(ViewerComponent) viewers: QueryList<ViewerComponent>;
@@ -132,21 +132,20 @@ export class ReaderComponent implements OnInit, OnChanges {
   //     return true;
   //   }
   // }
-  inCacheRange(set: number[], p: number): boolean {
-    const distance = ((set: number[], p: number) => {
-      let min = 1e10;
-      set.forEach(s => {
-        const d = s - p;
-        if (Math.abs(d) < Math.abs(min)) {
-          min = d;
-        }
-      });
-      return min;
-    })(set, p);
-    const BACKWARD = 2;
-    const FORWARD = 5;
+  inCacheRange(page: number): boolean {
+    // let distance = 1e10;
+    // this.recorder.stack.map(id => parseInt(id)).forEach(p => {
+    //   const d = p - page;
+    //   if (Math.abs(d) < Math.abs(distance)) {
+    //     distance = d;
+    //   }
+    // });
+    const distance = page - this.book.current;
+    const BACKWARD = 5;
+    const FORWARD = 10;
     return -1 * BACKWARD <= distance && distance <= FORWARD;
   }
+
 
   getPageHeight(p: PageMeta, pages: HTMLElement) {
     const xScale = 100;

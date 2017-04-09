@@ -12,7 +12,7 @@
   <!--[style.maxWidth.%]="scale"-->
   <!--[style.border]="'1px solid purple'"-->
   <div class="loading"
-       [hidden]="show">
+       *ngIf="!show">
     <div class="words">
       <div class="page">Page {{page}}</div>
       <!--<div class="status">{{meta.Type}}: {{meta.Width}}-{{meta.Height}}</div>-->

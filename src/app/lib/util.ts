@@ -74,7 +74,7 @@ export class Dismiss {
 }
 
 export class RustyLock {
-  finishTime: number;
+  finishTime: number = 0;
 
   constructor() {
   }

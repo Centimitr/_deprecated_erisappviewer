@@ -10,7 +10,7 @@
           [id]="'page-'+(i+1)"
           [class]="i"
           [page]="i+1"
-          [cache]="true"
+          [cache]="inCacheRange(i+1)"
           [path]="book?.getPageFilePath(p.Id)"
           [meta]="p"
           (click)="book?.next(i+1)">
