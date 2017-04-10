@@ -124,6 +124,9 @@ export class ReaderComponent implements OnInit, OnChanges {
   //   }
   // };
 
+  @HostListener('window:resize', ['$event']) onResize() {
+  }
+
   // private inCacheRange(page: number): boolean {
   //   const BACKWARD = 2;
   //   const FORWARD = 5;
@@ -141,8 +144,8 @@ export class ReaderComponent implements OnInit, OnChanges {
     //   }
     // });
     const distance = page - this.book.current;
-    const BACKWARD = 5;
-    const FORWARD = 10;
+    const BACKWARD = 3;
+    const FORWARD = 7;
     return -1 * BACKWARD <= distance && distance <= FORWARD;
   }
 
