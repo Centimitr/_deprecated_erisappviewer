@@ -15,7 +15,6 @@ export class Book {
 
   bind(elms: HTMLElement[]) {
     this._viewers = elms;
-    console.log(this._viewers);
   }
 
   get current(): number {

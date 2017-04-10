@@ -7,13 +7,15 @@ import {AppComponent} from './app.component';
 import {ViewerComponent} from './viewer/viewer.component';
 import {TrustResourceUrlPipe} from './trust-resource-url.pipe';
 import {ReaderComponent} from './reader/reader.component';
+import { PageHeightPipe } from './page-height.pipe';
 
 @NgModule({
   declarations: [
     AppComponent,
     ViewerComponent,
     ReaderComponent,
-    TrustResourceUrlPipe
+    TrustResourceUrlPipe,
+    PageHeightPipe
   ],
   imports: [
     BrowserModule,

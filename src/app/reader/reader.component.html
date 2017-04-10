@@ -6,7 +6,7 @@
 <!--</viewer>-->
 <section class="pages" #pages>
   <viewer #page *ngFor="let p of book?.meta?.Pages; let i = index;"
-          [height]="getPageHeight(p, pages)"
+          [height]="p | pageHeight:[pages,scale]"
           [id]="'page-'+(i+1)"
           [class]="i"
           [page]="i+1"

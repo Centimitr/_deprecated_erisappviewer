@@ -33,9 +33,15 @@ export class ViewerComponent implements OnInit, OnChanges {
   show: boolean = false;
   classNames: ClassNames = new ClassNames();
   elm: any;
+  inView: boolean = false;
 
   constructor(elm: ElementRef) {
     this.elm = elm.nativeElement;
+    const io = new IntersectionObserver((entries) => {
+      this.inView = !this.inView;
+      console.log(this.page, 'inView:', this.inView);
+    });
+    io.observe(this.elm)
   }
 
   async ngOnInit() {

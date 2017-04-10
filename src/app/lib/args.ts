@@ -25,12 +25,12 @@ export class Args {
 const args: Args = new Args();
 
 ipcRenderer.on('path', (event, message) => {
-  console.log('path:', message);
+  // console.log('path:', message);
   args.path = message;
   args.check();
 });
 ipcRenderer.on('port', (event, message) => {
-  console.log('port:', message);
+  // console.log('port:', message);
   args.port = message;
   args.check();
 });
