@@ -11,9 +11,9 @@
           [class]="i"
           [page]="i+1"
           [cache]="inCacheRange(i+1)"
-          [path]="book?.getPageFilePath(p.Id)"
+          [path]="book.getPageFilePath(p.Id)"
           [meta]="p"
-          (attention)="onAttention(i+1)"
+          (attention)="book.updateCurrent(i+1)"
           (click)="book.next(i+1)">
   </viewer>
   <!--[cache]="inCacheRange(recorder.stack, i)"-->

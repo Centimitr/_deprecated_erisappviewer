@@ -1,4 +1,4 @@
-import {Component, OnInit, Input, OnChanges, ElementRef, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit, Input, OnChanges, ElementRef, Output, EventEmitter, NgZone} from '@angular/core';
 import {PageMeta} from "../reader/meta";
 import {Checker} from "../lib/util";
 const getWindowSize = () => {
@@ -39,12 +39,12 @@ export class ViewerComponent implements OnInit, OnChanges {
   @Output() leave = new EventEmitter<null>();
   @Output() attention = new EventEmitter<null>();
 
-  constructor(elm: ElementRef) {
+  constructor(elm: ElementRef, private zone: NgZone) {
     this.elm = elm.nativeElement;
   }
 
   async ngOnInit() {
-    const checker = new Checker(300);
+    const checker = new Checker(50);
     const io = new IntersectionObserver(() => {
       this.inView = !this.inView;
       if (this.inView) {
@@ -56,13 +56,14 @@ export class ViewerComponent implements OnInit, OnChanges {
         };
         checker.check(() => {
           const ratio = getRatio(this.elm.getBoundingClientRect());
-          const FOCUS_RATIO = 0.45;
+          const FOCUS_RATIO = 0.35;
           if (ratio > FOCUS_RATIO) {
             return true;
           }
         }, () => {
-          console.log(this.page);
-          this.attention.emit();
+          this.zone.run(() => {
+            this.attention.emit();
+          });
         }, 1);
       } else {
         checker.clear();

@@ -31,36 +31,14 @@ export class ReaderComponent implements OnInit, OnChanges {
   async ngOnInit() {
   }
 
-  onready() {
-    console.log('onready');
-  }
-
-  onAttention(page: number){
-    this.zone.run(()=>{
-      this.book.updateCurrent(page);
-    });
-  }
-
   async ngOnChanges(changes) {
     if (changes.path && this.path) {
       this.book = new Book(this.path);
       await this.book.init();
-      // this.book.bind(this.viewers._result.map(viewer => viewer.elm));
       this.viewers.changes.subscribe(() => {
         this.book.bind(this.viewers.map(viewer => viewer.elm));
       });
 
-      // intersection
-      // if (this.recorder) {
-      //   this.recorder.io.disconnect();
-      // }
-      // this.recorder = new EnterLeaveRecorder((entries) => {
-      //   const top = +entries.map(e => this.recorder.toggle('' + (+e.target.className + 1))).pop();
-      //   this.zone.run(() => this.book.updateCurrent(top));
-      // }, {threshold: [0.6]});
-      // setTimeout(() => {
-      //   this.viewers.forEach(viewer => this.recorder.io.observe(viewer.elm));
-      // }, 0);
       // touchBar
       const getProgressStr = (current: number = this.book.current) => current + '/' + this.book.total;
       const lock = new RustyLock();
@@ -125,6 +103,7 @@ export class ReaderComponent implements OnInit, OnChanges {
   // };
 
   @HostListener('window:resize', ['$event']) onResize() {
+    console.warn('RESIZED!');
   }
 
   // private inCacheRange(page: number): boolean {
