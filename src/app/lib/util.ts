@@ -89,3 +89,32 @@ export class RustyLock {
     }
   }
 }
+
+export class Checker {
+  timer: Timer;
+
+  constructor(private freq: number) {
+  }
+
+  check(checkFn: () => boolean, cb: () => any, times: number = -1) {
+    const call = () => {
+      if (checkFn()) {
+        if (times > 0) {
+          times--;
+        }
+        cb();
+        if (times === 0) {
+          this.clear();
+        }
+      }
+    };
+    call();
+    this.timer = setInterval(() => {
+      call();
+    }, this.freq)
+  }
+
+  clear() {
+    clearInterval(this.timer);
+  }
+}

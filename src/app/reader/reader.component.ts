@@ -16,7 +16,7 @@ export class ReaderComponent implements OnInit, OnChanges {
   @Input() path: string;
   book: Book;
   scale: number = 200;
-  recorder: EnterLeaveRecorder;
+  // recorder: EnterLeaveRecorder;
 
   @ViewChildren(ViewerComponent) viewers: QueryList<ViewerComponent>;
 
@@ -35,6 +35,12 @@ export class ReaderComponent implements OnInit, OnChanges {
     console.log('onready');
   }
 
+  onAttention(page: number){
+    this.zone.run(()=>{
+      this.book.updateCurrent(page);
+    });
+  }
+
   async ngOnChanges(changes) {
     if (changes.path && this.path) {
       this.book = new Book(this.path);
@@ -45,16 +51,16 @@ export class ReaderComponent implements OnInit, OnChanges {
       });
 
       // intersection
-      if (this.recorder) {
-        this.recorder.io.disconnect();
-      }
-      this.recorder = new EnterLeaveRecorder((entries) => {
-        const top = +entries.map(e => this.recorder.toggle('' + (+e.target.className + 1))).pop();
-        this.zone.run(() => this.book.updateCurrent(top));
-      }, {threshold: [0.6]});
-      setTimeout(() => {
-        this.viewers.forEach(viewer => this.recorder.io.observe(viewer.elm));
-      }, 0);
+      // if (this.recorder) {
+      //   this.recorder.io.disconnect();
+      // }
+      // this.recorder = new EnterLeaveRecorder((entries) => {
+      //   const top = +entries.map(e => this.recorder.toggle('' + (+e.target.className + 1))).pop();
+      //   this.zone.run(() => this.book.updateCurrent(top));
+      // }, {threshold: [0.6]});
+      // setTimeout(() => {
+      //   this.viewers.forEach(viewer => this.recorder.io.observe(viewer.elm));
+      // }, 0);
       // touchBar
       const getProgressStr = (current: number = this.book.current) => current + '/' + this.book.total;
       const lock = new RustyLock();

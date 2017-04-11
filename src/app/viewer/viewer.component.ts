@@ -1,5 +1,6 @@
-import {Component, OnInit, Input, OnChanges, ElementRef} from '@angular/core';
+import {Component, OnInit, Input, OnChanges, ElementRef, Output, EventEmitter} from '@angular/core';
 import {PageMeta} from "../reader/meta";
+import {Checker} from "../lib/util";
 const getWindowSize = () => {
   return [window.innerWidth, window.innerHeight];
 };
@@ -34,17 +35,41 @@ export class ViewerComponent implements OnInit, OnChanges {
   classNames: ClassNames = new ClassNames();
   elm: any;
   inView: boolean = false;
+  @Output() enter = new EventEmitter<null>();
+  @Output() leave = new EventEmitter<null>();
+  @Output() attention = new EventEmitter<null>();
 
   constructor(elm: ElementRef) {
     this.elm = elm.nativeElement;
-    const io = new IntersectionObserver((entries) => {
-      this.inView = !this.inView;
-      console.log(this.page, 'inView:', this.inView);
-    });
-    io.observe(this.elm)
   }
 
   async ngOnInit() {
+    const checker = new Checker(300);
+    const io = new IntersectionObserver(() => {
+      this.inView = !this.inView;
+      if (this.inView) {
+        this.enter.emit();
+        const getRatio = function (rect: ClientRect) {
+          const w = Math.min(Math.max(rect.right, 0), window.innerWidth) - Math.max(rect.left, 0);
+          const h = Math.min(Math.max(rect.bottom, 0), window.innerWidth) - Math.max(rect.top, 0);
+          return (w * h) / Math.min(rect.width * rect.height, window.innerWidth * window.innerHeight)
+        };
+        checker.check(() => {
+          const ratio = getRatio(this.elm.getBoundingClientRect());
+          const FOCUS_RATIO = 0.45;
+          if (ratio > FOCUS_RATIO) {
+            return true;
+          }
+        }, () => {
+          console.log(this.page);
+          this.attention.emit();
+        }, 1);
+      } else {
+        checker.clear();
+        this.leave.emit();
+      }
+    });
+    io.observe(this.elm);
   }
 
   ngOnChanges(changes) {
