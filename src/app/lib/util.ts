@@ -118,3 +118,27 @@ export class Checker {
     clearInterval(this.timer);
   }
 }
+
+export class ABMap {
+  mapA: object = {};
+  mapB: object = {};
+
+  constructor(enumArr?: any[]) {
+    if (enumArr) {
+      enumArr.forEach((item, i) => this.set(i, item));
+    }
+  }
+
+  set(a: any, b: any) {
+    this.mapA[a] = b;
+    this.mapB[b] = a;
+  }
+
+  getA(b: any) {
+    return this.mapB[b];
+  }
+
+  getB(a: any) {
+    return this.mapA[a];
+  }
+}

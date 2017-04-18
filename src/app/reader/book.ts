@@ -1,5 +1,6 @@
 import {BookMeta} from "./meta";
 import args from "../lib/args";
+import {Config} from "./config";
 
 export class Book {
   locator: string;
@@ -9,7 +10,7 @@ export class Book {
   _onPage: Function[] = [];
   _viewers: HTMLElement[];
 
-  constructor(path: string) {
+  constructor(path: string, private config: Config) {
     this.locator = path;
   }
 
@@ -60,10 +61,21 @@ export class Book {
     const ok = this.checkPage(page);
     if (ok) {
       const viewer = this._viewers[page - 1];
-      viewer.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
+      if (this.config.isSinglePage()) {
+        this.current = page;
+        setTimeout(() => {
+          viewer.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }, 0);
+      } else {
+        viewer.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+
+      }
     }
     return ok;
   }
