@@ -1,4 +1,7 @@
-import {Component, OnInit, Input, HostListener, NgZone, OnChanges, ViewChildren, QueryList} from '@angular/core';
+import {
+  Component, OnInit, Input, HostListener, NgZone, OnChanges, ViewChildren, QueryList,
+  Output, EventEmitter
+} from '@angular/core';
 import {
   setTouchBar,
   TouchBarButton,
@@ -6,7 +9,7 @@ import {
   TouchBarSegmentedControl,
   TouchBarScrubber
 } from "../lib/touchbar";
-import {ABMap, Dismiss, EnterLeaveRecorder, IntervalTimer, RustyLock} from "../lib/util";
+import {ABMap, RustyLock} from "../lib/util";
 import {Book} from "./book";
 import {ViewerComponent} from "../viewer/viewer.component";
 import {Config} from "./config";
@@ -20,10 +23,11 @@ const fs = window['require']('fs');
 export class ReaderComponent implements OnInit, OnChanges {
 
   @Input() path: string;
+  @Input() refresh: number;
   book: Book;
   scale: number = 133;
   config: Config;
-  // recorder: EnterLeaveRecorder;
+  @Output() fail = new EventEmitter<any>();
 
   @ViewChildren(ViewerComponent) viewers: QueryList<ViewerComponent>;
 
@@ -40,9 +44,13 @@ export class ReaderComponent implements OnInit, OnChanges {
   }
 
   async ngOnChanges(changes) {
-    if (changes.path && this.path) {
+    if (changes.path && this.path || this.refresh) {
       this.book = new Book(this.path, this.config);
-      await this.book.init();
+      let e = await this.book.init();
+      if (e) {
+        this.fail.emit(e);
+        return;
+      }
       this.viewers.changes.subscribe(() => {
         this.book.bind(this.viewers.map(viewer => viewer.elm));
       });

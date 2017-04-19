@@ -4,9 +4,7 @@
          [class.overflow]="config.isSinglePage()&&isOverflow(height, viewer)"
          [style.Height.px]="config.whenContinuousScroll(height)"
          [style.minHeight.px]="config.whenContinuousScroll(height)"
-         [style.maxHeight.px]="config.whenContinuousScroll(height)"
->
-  *ngIf="!show">
+         [style.maxHeight.px]="config.whenContinuousScroll(height)">
   <div class="loading">
     <div class="words">
       <div class="page">Page {{page}}</div>
@@ -18,6 +16,5 @@
        [style.maxHeight.px]="height"
        [class.visible]="show && inView"
        *ngIf="cache"
-       [hidden]="!show"
        (load)="onLoad($event, img)">
 </section>

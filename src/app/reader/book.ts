@@ -28,15 +28,14 @@ export class Book {
     this._onPage.forEach(cb => cb(page, old));
   }
 
-  async init() {
+  async init(): Promise<any> {
     await args.wait();
     const url = new URL(`http://localhost:${args.port}/book`);
-    console.log(url);
     url['searchParams'].append('locator', this.locator);
     const data = await fetch(url.href);
     this.meta = await data.json();
     if (!this.meta.Pages) {
-      throw new Error('no pages');
+      return 'no pages';
     }
     this.total = this.meta.Pages.length;
     this.current = 1;

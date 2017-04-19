@@ -1,9 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, NgZone, OnInit} from '@angular/core';
 import args from "./lib/args";
 const electron = window['require']('electron');
 const {webFrame} = electron;
 const {dialog, getCurrentWindow} = electron.remote;
-
 
 @Component({
   selector: 'app-root',
@@ -12,8 +11,9 @@ const {dialog, getCurrentWindow} = electron.remote;
 })
 export class AppComponent implements OnInit {
   path: string;
+  refresh: number = 0;
 
-  constructor() {
+  constructor(private zone: NgZone) {
 
   }
 
@@ -22,18 +22,26 @@ export class AppComponent implements OnInit {
     const win = getCurrentWindow();
     await args.wait();
     const path = args.path;
-    console.log('Open From FileAssociation:', path);
-    if (path) {
+    console.warn('PATH:', path);
+    this.zone.run(() => {
       this.path = path;
-    }
+    })
+    // if (path) {
+    // }
     // check is user folder
     // check path has images
     // const isUserImagesFolder = false;
-    if (this.path) {
-      this.path = dialog.showOpenDialog({properties: ['openFile', 'openDirectory']}).pop();
-    }
+    // if (!this.path) {
+    //   this.path = dialog.showOpenDialog({properties: ['openFile', 'openDirectory']}).pop();
+    // }
     // this.path = '/Users/shixiao/Pictures';
     // this.path = '/Users/shixiao/Downloads/a/top20/8';
-    win.show();
+    // win.show();
+  }
+
+  onFail(e) {
+    console.warn('FAIL!', e);
+    this.path = dialog.showOpenDialog({properties: ['openFile', 'openDirectory']}).pop();
+    this.refresh++;
   }
 }

@@ -81,40 +81,8 @@ export class ViewerComponent implements OnInit, OnChanges {
     }
   }
 
-  // isX(img?: HTMLImageElement) {
-  //   if (img) {
-  //     const [w, h] = getWindowSize();
-  //     return img.width / img.height > w / h;
-  //   }
-  // }
-
-  //
-  // isTiny(img?: ImageMeta) {
-  //   if (img) {
-  //     const [w, h] = getWindowSize();
-  //     return this.scale < 100 || (img.width < w && img.height < h);
-  //   }
-  // }
-  //
-  // isHuge(img?: ImageMeta) {
-  //   if (img) {
-  //     const [w, h] = getWindowSize();
-  //     const ratio = this.scale / 100;
-  //     return img.width * ratio > w && img.height * ratio > h;
-  //   }
-  // }
-
-  // max(img?: ImageMeta) {
-  //   return this.isTiny(img) ? 100 : this.scale;
-  // }
   //
   onLoad(e, img) {
-    this.refresh(img);
-  }
-
-  refresh(img) {
-    // console.table([{'width': img.width, 'height': img.height}]);
-    this.classNames.add('y');
     this.show = true;
   }
 
