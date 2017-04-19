@@ -1,6 +1,7 @@
 import {Component, OnInit, Input, OnChanges, ElementRef, Output, EventEmitter, NgZone} from '@angular/core';
 import {PageMeta} from "../reader/meta";
 import {Checker} from "../lib/util";
+import {Config} from "../reader/config";
 const getWindowSize = () => {
   return [window.innerWidth, window.innerHeight];
 };
@@ -31,6 +32,7 @@ export class ViewerComponent implements OnInit, OnChanges {
   @Input() page: number;
   @Input() height: number;
   @Input() cache: boolean;
+  @Input() config: Config;
   show: boolean = false;
   classNames: ClassNames = new ClassNames();
   elm: any;
@@ -116,4 +118,9 @@ export class ViewerComponent implements OnInit, OnChanges {
     this.show = true;
   }
 
+  isOverflow(height: number, base: HTMLElement) {
+    if (base.offsetHeight) {
+      return base.offsetHeight < height;
+    }
+  }
 }

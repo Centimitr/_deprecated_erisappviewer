@@ -1,6 +1,9 @@
-<section class="pages" #pages>
+<section class="pages" #pages
+         [class.singlePage]="config.isSinglePage()"
+         [class.continuousScroll]="config.isContinuousScroll()">
   <viewer #page *ngFor="let p of book?.meta?.Pages; let i = index;"
-          [hidden]="config.isContinuousScroll()? false: i+1!==book.current"
+          [config]="config"
+          [hidden]="config.isContinuousScroll()? false: (i+1!==book.current)"
           [height]="p | pageHeight:[pages,scale]"
           [id]="'page-'+(i+1)"
           [class]="i"
@@ -11,8 +14,6 @@
           (attention)="book.updateCurrent(i+1)"
           (click)="book.next(i+1, true)">
   </viewer>
-  <!--[cache]="inCacheRange(i+1)"-->
-  <!--[hidden]="i!==book?.current-1"-->
 </section>
 <section class="layer">
   <section class="panel progress" *ngIf="book?.total">

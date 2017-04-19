@@ -24,6 +24,12 @@ export class Config {
     return this.view === Config.VIEW_CONTINUOUS_SCROLL;
   }
 
+  whenContinuousScroll(v: any) {
+    if (this.isContinuousScroll()) {
+      return v;
+    }
+  }
+
   isSinglePage() {
     return this.view === Config.VIEW_SINGLE_PAGE;
   }

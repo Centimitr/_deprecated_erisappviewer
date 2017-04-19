@@ -1,47 +1,9 @@
-::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-}
-
-:host {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-section.pages {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  flex-flow: column nowrap;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  overflow-scrolling: touch;
-  scroll-behavior: smooth;
-}
-
-viewer {
-  width: 100%;
-}
-
-viewer + viewer {
-  margin-top: 7vh;
-}
-
 .layer {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-}
-
-.layer {
   pointer-events: none;
 }
 

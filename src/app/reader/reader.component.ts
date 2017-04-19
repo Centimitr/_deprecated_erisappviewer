@@ -8,7 +8,6 @@ import {
 } from "../lib/touchbar";
 import {ABMap, Dismiss, EnterLeaveRecorder, IntervalTimer, RustyLock} from "../lib/util";
 import {Book} from "./book";
-import {PageMeta} from "./meta";
 import {ViewerComponent} from "../viewer/viewer.component";
 import {Config} from "./config";
 const fs = window['require']('fs');
@@ -16,7 +15,7 @@ const fs = window['require']('fs');
 @Component({
   selector: 'reader',
   templateUrl: './reader.component.html',
-  styleUrls: ['./reader.component.css'],
+  styleUrls: ['./_common.css', './_pages.css', './_layer.css'],
 })
 export class ReaderComponent implements OnInit, OnChanges {
 
@@ -71,7 +70,20 @@ export class ReaderComponent implements OnInit, OnChanges {
       const barScaleMap = new ABMap(Config.SCALE_ALL);
       const barViewMap = new ABMap(Config.VIEW_ALL);
       setTouchBar([
-        new TouchBarButton({label: 'Page 1', click: () => this.zone.run(() => this.book.go(1))}),
+        new TouchBarSegmentedControl({
+          segments: [
+            {label: 'Scroll'},
+            {label: 'Single'},
+          ],
+          selectedIndex: barViewMap.getA(this.config.view),
+          change: selectedIndex => {
+            this.zone.run(() => {
+              this.config.setView(barViewMap.getB(selectedIndex));
+              console.log(this.config);
+            });
+          }
+        }),
+        // new TouchBarButton({label: 'Page 1', click: () => this.zone.run(() => this.book.go(1))}),
         slider,
         // new TouchBarScrubber({
         //   items: (new Array(this.book.total)).fill(1).map((v, i) => '' + i).map(i => ({label: i})),
@@ -89,19 +101,6 @@ export class ReaderComponent implements OnInit, OnChanges {
           change: selectedIndex => {
             this.zone.run(() => {
               this.config.setScale(barScaleMap.getB(selectedIndex));
-              console.log(this.config);
-            });
-          }
-        }),
-        new TouchBarSegmentedControl({
-          segments: [
-            {label: 'Scroll'},
-            {label: 'Single'},
-          ],
-          selectedIndex: barViewMap.getA(this.config.view),
-          change: selectedIndex => {
-            this.zone.run(() => {
-              this.config.setView(barViewMap.getB(selectedIndex));
               console.log(this.config);
             });
           }

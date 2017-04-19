@@ -1,16 +1,11 @@
-<section class="viewer"
-         [class]="classNames.get()"
-         [style.Height.px]="height"
-         [style.minHeight.px]="height"
-         [style.maxHeight.px]="height"
+<section class="viewer" #viewer
+         [class.singlePage]="config.isSinglePage()"
+         [class.continuousScroll]="config.isContinuousScroll()"
+         [class.overflow]="config.isSinglePage()&&isOverflow(height, viewer)"
+         [style.Height.px]="config.whenContinuousScroll(height)"
+         [style.minHeight.px]="config.whenContinuousScroll(height)"
+         [style.maxHeight.px]="config.whenContinuousScroll(height)"
 >
-  <!--[class.y]="!isX(img)"-->
-  <!--[class.tiny]="isTiny(img)"-->
-  <!--[class.huge]="isHuge(img)">-->
-  <!--<img *ngIf="img?.src"-->
-  <!--[src]="img?.src | trustResourceUrl"-->
-  <!--[style.maxWidth.%]="scale"-->
-  <!--[style.border]="'1px solid purple'"-->
   *ngIf="!show">
   <div class="loading">
     <div class="words">
@@ -26,7 +21,3 @@
        [hidden]="!show"
        (load)="onLoad($event, img)">
 </section>
-<!--[style.maxHeight.vh]="100"-->
-<!--<div style="color: white;">{{img?.src}}</div>-->
-
-<div ng-show="news.length">no data</div>
