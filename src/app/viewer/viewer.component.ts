@@ -89,10 +89,9 @@ export class ViewerComponent implements OnInit, OnChanges {
     this.show = true;
   }
 
-  isOverflow(height: number, base: HTMLElement) {
+  isOverflow(base: HTMLElement) {
     if (base.offsetHeight) {
-      return base.offsetHeight < height;
+      return base.offsetHeight < this.height;
     }
   }
-
 }

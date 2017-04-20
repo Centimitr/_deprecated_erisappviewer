@@ -89,7 +89,6 @@ export class ReaderComponent implements OnInit, OnChanges {
           change: selectedIndex => {
             this.zone.run(() => {
               this.config.view.set(barViewMap.getB(selectedIndex));
-              console.log(this.config);
             });
           }
         }),

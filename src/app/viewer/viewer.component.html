@@ -1,7 +1,7 @@
 <section class="viewer" #viewer
          [class.singlePage]="config.isSinglePage()"
          [class.continuousScroll]="config.isContinuousScroll()"
-         [class.overflow]="config.isSinglePage()&&isOverflow(height, viewer)"
+         [class.overflow]="config.isSinglePage()&&isOverflow(viewer)"
          [style.height.px]="config.whenContinuousScroll(config.whenNotFullWidth(height))"
          [style.minHeight.px]="config.whenContinuousScroll(config.whenNotFullWidth(height))"
          [style.maxHeight.px]="config.whenContinuousScroll(config.whenNotFullWidth(height))">
@@ -13,8 +13,8 @@
     </div>
   </div>
   <img #img [src]="path"
-       [style.marginTop.vh]="config.whenSinglePage(config.ui.view.singlePage.before)"
-       [style.marginBottom.vh]="config.whenSinglePage(config.ui.view.singlePage.after)"
+       [style.marginTop.vh]="config.whenSinglePage(config.whenNotFullHeight(config.ui.view.singlePage.before))"
+       [style.marginBottom.vh]="config.whenSinglePage(config.whenNotFullHeight(config.ui.view.singlePage.after))"
        [style.maxHeight.px]="config.whenNotFullWidth(height)"
        [style.minWidth.%]="config.whenFullWidth(100)"
        [style.width.%]="config.whenFullWidth(100)"

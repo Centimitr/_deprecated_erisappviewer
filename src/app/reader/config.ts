@@ -1,3 +1,6 @@
+let cnt = 0;
+const pt = v => console.log(cnt++, v);
+
 export class ConfigItem<T> {
   private listeners = [];
   private value: any;
@@ -22,11 +25,11 @@ export class ConfigItem<T> {
     return this.listeners.push(cb);
   }
 
-  toValue(): T{
+  toValue(): T {
     return this.value;
   }
 
-  toString(){
+  toString() {
     return this.toValue().toString();
   }
 }
@@ -50,10 +53,10 @@ export class Config {
 
   // scale
   scale = new ConfigItem<number>(Config.SCALE_DEFAULT);
-  static SCALE_MIN: number = 100;
   static SCALE_DEFAULT: number = 150;
+  static SCALE_FULL_HEIGHT: number = 100;
   static SCALE_FULL_WIDTH: number = Infinity;
-  static SCALE_ALL: number[] = [Config.SCALE_MIN, Config.SCALE_DEFAULT, Config.SCALE_FULL_WIDTH];
+  static SCALE_ALL: number[] = [Config.SCALE_FULL_HEIGHT, Config.SCALE_DEFAULT, Config.SCALE_FULL_WIDTH];
 
   isFullWidth(): boolean {
     return this.scale.get() === Config.SCALE_FULL_WIDTH;
@@ -67,6 +70,22 @@ export class Config {
 
   whenNotFullWidth(v: any): boolean {
     if (!this.isFullWidth()) {
+      return v;
+    }
+  }
+
+  isFullHeight(): boolean {
+    return this.scale.get() === Config.SCALE_FULL_HEIGHT;
+  }
+
+  whenFullHeight(v: any): boolean {
+    if (this.isFullHeight()) {
+      return v;
+    }
+  }
+
+  whenNotFullHeight(v: any): boolean {
+    if (!this.isFullHeight()) {
       return v;
     }
   }
