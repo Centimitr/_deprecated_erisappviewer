@@ -19,28 +19,20 @@ export class AppComponent implements OnInit {
 
   async ngOnInit() {
     webFrame.setVisualZoomLevelLimits(1, 1);
-    const win = getCurrentWindow();
     await args.wait();
     const path = args.path;
     console.warn('PATH:', path);
-    this.zone.run(() => {
-      this.path = path;
-    })
-    // if (path) {
-    // }
-    // check is user folder
-    // check path has images
-    // const isUserImagesFolder = false;
-    // if (!this.path) {
-    //   this.path = dialog.showOpenDialog({properties: ['openFile', 'openDirectory']}).pop();
-    // }
+    this.path = path;
     // this.path = '/Users/shixiao/Pictures';
     // this.path = '/Users/shixiao/Downloads/a/top20/8';
-    // win.show();
+  }
+
+  onOk() {
+    getCurrentWindow().show();
   }
 
   onFail(e) {
-    console.warn('FAIL!', e);
+    console.warn('FAIL:', e);
     this.path = dialog.showOpenDialog({properties: ['openFile', 'openDirectory']}).pop();
     this.refresh++;
   }

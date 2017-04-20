@@ -27,6 +27,7 @@ export class ReaderComponent implements OnInit, OnChanges {
   book: Book;
   scale: number = 133;
   config: Config;
+  @Output() ok = new EventEmitter<null>();
   @Output() fail = new EventEmitter<any>();
 
   @ViewChildren(ViewerComponent) viewers: QueryList<ViewerComponent>;
@@ -51,6 +52,7 @@ export class ReaderComponent implements OnInit, OnChanges {
         this.fail.emit(e);
         return;
       }
+      this.ok.emit();
       this.viewers.changes.subscribe(() => {
         this.book.bind(this.viewers.map(viewer => viewer.elm));
       });
@@ -83,10 +85,10 @@ export class ReaderComponent implements OnInit, OnChanges {
             {label: 'Scroll'},
             {label: 'Single'},
           ],
-          selectedIndex: barViewMap.getA(this.config.view),
+          selectedIndex: barViewMap.getA(this.config.view.get()),
           change: selectedIndex => {
             this.zone.run(() => {
-              this.config.setView(barViewMap.getB(selectedIndex));
+              this.config.view.set(barViewMap.getB(selectedIndex));
               console.log(this.config);
             });
           }
@@ -105,11 +107,10 @@ export class ReaderComponent implements OnInit, OnChanges {
             {label: 'Auto'},
             {label: 'W 100%'},
           ],
-          selectedIndex: barScaleMap.getA(this.config.scale),
+          selectedIndex: barScaleMap.getA(this.config.scale.get()),
           change: selectedIndex => {
             this.zone.run(() => {
-              this.config.setScale(barScaleMap.getB(selectedIndex));
-              console.log(this.config);
+              this.config.scale.set(barScaleMap.getB(selectedIndex));
             });
           }
         }),
@@ -123,8 +124,8 @@ export class ReaderComponent implements OnInit, OnChanges {
     console.log(this.scale)
   }
 
+  // @HostListener('window:keydown.arrowUp', ['$event'])
   @HostListener('window:keydown.pageUp', ['$event'])
-  @HostListener('window:keydown.arrowUp', ['$event'])
   @HostListener('window:keydown.arrowLeft', ['$event'])
   prev() {
     if (this.book) {
@@ -134,8 +135,8 @@ export class ReaderComponent implements OnInit, OnChanges {
     }
   };
 
-  // @HostListener('window:keydown.pageDown', ['$event'])
-  @HostListener('window:keydown.arrowDown', ['$event'])
+  // @HostListener('window:keydown.arrowDown', ['$event'])
+  @HostListener('window:keydown.pageDown', ['$event'])
   @HostListener('window:keydown.arrowRight', ['$event'])
   next() {
     if (this.book) {

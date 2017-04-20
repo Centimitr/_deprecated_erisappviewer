@@ -1,25 +1,13 @@
-import {Component, OnInit, Input, OnChanges, ElementRef, Output, EventEmitter, NgZone} from '@angular/core';
+import {
+  Component, OnInit, Input, OnChanges, ElementRef, Output, EventEmitter, NgZone,
+  HostListener
+} from '@angular/core';
 import {PageMeta} from "../reader/meta";
 import {Checker} from "../lib/util";
 import {Config} from "../reader/config";
 const getWindowSize = () => {
   return [window.innerWidth, window.innerHeight];
 };
-class ClassNames {
-  names: string[] = [];
-
-  get(): string[] {
-    return this.names;
-  }
-
-  clear() {
-    this.names = [];
-  }
-
-  add(c: string) {
-    this.names.push(c);
-  }
-}
 
 @Component({
   selector: 'viewer',
@@ -30,11 +18,10 @@ export class ViewerComponent implements OnInit, OnChanges {
   @Input() path: string;
   @Input() meta: PageMeta;
   @Input() page: number;
-  @Input() height: number;
+  height: number;
   @Input() cache: boolean;
   @Input() config: Config;
   show: boolean = false;
-  classNames: ClassNames = new ClassNames();
   elm: any;
   inView: boolean = false;
   @Output() enter = new EventEmitter<null>();
@@ -73,15 +60,31 @@ export class ViewerComponent implements OnInit, OnChanges {
       }
     });
     io.observe(this.elm);
+    this.setHeight();
+    this.config.scale.change(() => {
+      this.zone.run(() => {
+        this.setHeight();
+      })
+    });
+  }
+
+  @HostListener('window:resize', ['$event']) onResize() {
+    this.setHeight()
+  }
+
+  setHeight() {
+    const pages: HTMLElement = this.elm.parentElement;
+    const p = this.meta;
+    const xScale = 100;
+    const yScale = this.config.scale.get();
+    const [w, h] = [xScale / 100 * pages.offsetWidth, yScale / 100 * pages.offsetHeight];
+    const scale = Math.min(1, w / p.Width, h / p.Height);
+    return this.height = p.Height * scale;
   }
 
   ngOnChanges(changes) {
-    if (changes.path || changes.scale) {
-      // console.timeEnd('overall');
-    }
   }
 
-  //
   onLoad(e, img) {
     this.show = true;
   }
@@ -91,4 +94,5 @@ export class ViewerComponent implements OnInit, OnChanges {
       return base.offsetHeight < height;
     }
   }
+
 }

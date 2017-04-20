@@ -1,5 +1,21 @@
 import Timer = NodeJS.Timer;
 
+class ClassNames {
+  names: string[] = [];
+
+  get(): string[] {
+    return this.names;
+  }
+
+  clear() {
+    this.names = [];
+  }
+
+  add(c: string) {
+    this.names.push(c);
+  }
+}
+
 export class IntervalTimer {
   lastRunTime: number;
   timer: Timer;

@@ -2,9 +2,9 @@
          [class.singlePage]="config.isSinglePage()"
          [class.continuousScroll]="config.isContinuousScroll()"
          [class.overflow]="config.isSinglePage()&&isOverflow(height, viewer)"
-         [style.Height.px]="config.whenContinuousScroll(height)"
-         [style.minHeight.px]="config.whenContinuousScroll(height)"
-         [style.maxHeight.px]="config.whenContinuousScroll(height)">
+         [style.height.px]="config.whenContinuousScroll(config.whenNotFullWidth(height))"
+         [style.minHeight.px]="config.whenContinuousScroll(config.whenNotFullWidth(height))"
+         [style.maxHeight.px]="config.whenContinuousScroll(config.whenNotFullWidth(height))">
   <div class="loading">
     <div class="words">
       <div class="page">Page {{page}}</div>
@@ -13,7 +13,11 @@
     </div>
   </div>
   <img #img [src]="path"
-       [style.maxHeight.px]="height"
+       [style.marginTop.vh]="config.whenSinglePage(config.ui.view.singlePage.before)"
+       [style.marginBottom.vh]="config.whenSinglePage(config.ui.view.singlePage.after)"
+       [style.maxHeight.px]="config.whenNotFullWidth(height)"
+       [style.minWidth.%]="config.whenFullWidth(100)"
+       [style.width.%]="config.whenFullWidth(100)"
        [class.visible]="show && inView"
        *ngIf="cache"
        (load)="onLoad($event, img)">
