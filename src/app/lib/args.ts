@@ -6,13 +6,14 @@ export class Args {
   port: number;
   _promise: Promise<any>;
   _resolve: Function;
+  sema: number = 0;
 
   constructor() {
     this._promise = new Promise(resolve => this._resolve = resolve);
   }
 
   check() {
-    if (this._resolve && this.path && this.port) {
+    if (this._resolve && this.sema >= 2) {
       this._resolve();
     }
   }
@@ -25,13 +26,15 @@ export class Args {
 const args: Args = new Args();
 
 ipcRenderer.on('path', (event, message) => {
-  // console.log('path:', message);
+  console.warn('PATH:', message);
   args.path = message;
+  args.sema++;
   args.check();
 });
 ipcRenderer.on('port', (event, message) => {
-  // console.log('port:', message);
+  console.warn('PORT:', message);
   args.port = message;
+  args.sema++;
   args.check();
 });
 
