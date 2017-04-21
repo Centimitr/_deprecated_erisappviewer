@@ -54,7 +54,7 @@ export class ReaderComponent implements OnInit, OnChanges {
       }
       this.ok.emit();
       this.viewers.changes.subscribe(() => {
-        this.book.bind(this.viewers.map(viewer => viewer.elm));
+        this.book.bind(this.viewers.map(v => v));
       });
 
       // touchBar
@@ -115,6 +115,14 @@ export class ReaderComponent implements OnInit, OnChanges {
         }),
         // new TouchBarButton({label: 'ZoomOut', click: () => this.zoom(-10)}),
       ]);
+      this.config.view.change(n => {
+        if (n === Config.VIEW_CONTINUOUS_SCROLL) {
+          const viewer = this.viewers.filter((v, i) => i + 1 === this.book.current)[0];
+          setTimeout(() => {
+            viewer.scrollTo();
+          }, 0);
+        }
+      });
     }
   }
 
@@ -149,14 +157,6 @@ export class ReaderComponent implements OnInit, OnChanges {
     console.warn('RESIZED!');
   }
 
-  // private inCacheRange(page: number): boolean {
-  //   const BACKWARD = 2;
-  //   const FORWARD = 5;
-  //   const current = this.book.current;
-  //   if (current - BACKWARD <= page && page <= current + FORWARD) {
-  //     return true;
-  //   }
-  // }
   inCacheRange(page: number): boolean {
     // let distance = 1e10;
     // this.recorder.stack.map(id => parseInt(id)).forEach(p => {
@@ -170,17 +170,6 @@ export class ReaderComponent implements OnInit, OnChanges {
     const FORWARD = 7;
     return -1 * BACKWARD <= distance && distance <= FORWARD;
   }
-
-
-  // getPageHeight(p: PageMeta, pages: HTMLElement) {
-  //   const xScale = 100;
-  //   const yScale = this.scale;
-  //   const [w, h] = [xScale / 100 * pages.offsetWidth, yScale / 100 * pages.offsetHeight];
-  //   const scale = Math.min(1, w / p.Width, h / p.Height);
-  //   console.log(pages.offsetWidth, pages.offsetHeight);
-  //   console.log(scale, p.Height*scale);
-  //   return p.Height * scale;
-  // }
 
   // @HostListener('window:mousewheel', ['$event'])
   // async onWheel(e) {

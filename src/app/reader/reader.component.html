@@ -11,7 +11,8 @@
           [path]="book.getPageFilePath(p.Id)"
           [meta]="p"
           (attention)="book.updateCurrent(i+1)"
-          (click)="book.next(i+1, true)">
+          (click)="book.next(i+1, true)"
+          (contextmenu)="book.prev(i+1, true)">
   </viewer>
 </section>
 <section class="layer">

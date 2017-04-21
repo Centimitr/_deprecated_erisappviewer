@@ -1,6 +1,7 @@
 import {BookMeta} from "./meta";
 import args from "../lib/args";
 import {Config} from "./config";
+import {ViewerComponent} from "../viewer/viewer.component";
 
 export class Book {
   locator: string;
@@ -8,14 +9,14 @@ export class Book {
   _current: number;
   total: number;
   _onPage: Function[] = [];
-  _viewers: HTMLElement[];
+  _viewers: ViewerComponent[];
 
   constructor(path: string, private config: Config) {
     this.locator = path;
   }
 
-  bind(elms: HTMLElement[]) {
-    this._viewers = elms;
+  bind(viewers: ViewerComponent[]) {
+    this._viewers = viewers;
   }
 
   get current(): number {
@@ -63,17 +64,10 @@ export class Book {
       if (this.config.isSinglePage()) {
         this.current = page;
         setTimeout(() => {
-          viewer.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
+          viewer.scrollTo();
         }, 0);
       } else {
-        viewer.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-
+        viewer.scrollTo();
       }
     }
     return ok;

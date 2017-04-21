@@ -37,6 +37,14 @@ export class ViewerComponent implements OnInit, OnChanges {
     this.overflow = new Promise<boolean>(resolve => this.resolveOverflow = resolve);
   }
 
+  scrollTo() {
+    console.log(this.elm.id);
+    this.elm.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  }
+
   async ngOnInit() {
     const checker = new Checker(50);
     const io = new IntersectionObserver(() => {
