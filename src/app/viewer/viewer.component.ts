@@ -3,7 +3,7 @@ import {
   HostListener
 } from '@angular/core';
 import {PageMeta} from "../reader/meta";
-import {Checker} from "../lib/util";
+import {Change, Checker, Semaphore} from "../lib/util";
 import {Config} from "../reader/config";
 const getWindowSize = () => {
   return [window.innerWidth, window.innerHeight];
@@ -24,13 +24,17 @@ export class ViewerComponent implements OnInit, OnChanges {
   show: boolean = false;
   elm: any;
   inView: boolean = false;
-  overflow: boolean;
+  overflow: Promise<boolean>;
+  resolveOverflow: Function;
   @Output() enter = new EventEmitter<null>();
   @Output() leave = new EventEmitter<null>();
   @Output() attention = new EventEmitter<null>();
+  c = new Change<string>();
 
   constructor(elm: ElementRef, private zone: NgZone) {
     this.elm = elm.nativeElement;
+    this.elm.addEventListener('ready', e => console.log(e));
+    this.overflow = new Promise<boolean>(resolve => this.resolveOverflow = resolve);
   }
 
   async ngOnInit() {
@@ -69,14 +73,9 @@ export class ViewerComponent implements OnInit, OnChanges {
     });
   }
 
-  ngAfterContentChecked() {
-    const base = this.elm.firstChild;
-    this.overflow = base.offsetHeight && base.offsetHeight < this.height;
-  }
-
   @HostListener('window:resize', ['$event'])
   onResize() {
-    this.setHeight()
+    this.setHeight();
   }
 
   setHeight() {
@@ -92,7 +91,19 @@ export class ViewerComponent implements OnInit, OnChanges {
   ngOnChanges(changes) {
   }
 
-  onLoad(e, img) {
+  checkOverflow() {
+    const h = this.elm.parentElement.offsetHeight;
+    const changed = this.c.changed(`${h}.${this.height}`);
+    if (changed && h) {
+      this.overflow = new Promise<boolean>(r => r(h < this.height));
+    }
+  }
+
+  ngAfterContentChecked() {
+    this.checkOverflow();
+  }
+
+  onLoad() {
     this.show = true;
   }
 }

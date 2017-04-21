@@ -158,3 +158,55 @@ export class ABMap {
     return this.mapA[a];
   }
 }
+
+export class Semaphore {
+  initial: number;
+
+  constructor(private permits: number) {
+    this.initial = permits;
+  }
+
+  set(p: number) {
+    this.permits = p;
+  }
+
+  reset(): number {
+    return this.permits = this.initial;
+  }
+
+  get(): number {
+    return this.permits;
+  }
+
+  wait(success?: Function, error?: Function): boolean {
+    if (this.permits > 0) {
+      success && success();
+      this.permits--;
+      return true;
+    } else {
+      error && error();
+      return false;
+    }
+  }
+
+  release(): number {
+    this.permits++;
+    return this.permits;
+  }
+}
+
+export class Change<T> {
+  v: T;
+
+  constructor(initial?: T) {
+    this.v = initial;
+  }
+
+  changed(n: T): boolean {
+    if (n !== this.v) {
+      this.v = n;
+      return true;
+    }
+    return false;
+  }
+}

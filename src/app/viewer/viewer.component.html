@@ -1,5 +1,5 @@
 <section class="viewer" #viewer
-         [class.overflow]="overflow"
+         [class.overflow]="overflow | async"
          [class.singlePage]="config.isSinglePage()"
          [class.continuousScroll]="config.isContinuousScroll()"
          [style.height.px]="config.whenContinuousScroll(config.whenNotFullWidth(height))"
@@ -20,5 +20,5 @@
        [style.width.%]="config.whenFullWidth(100)"
        [class.visible]="show && inView"
        *ngIf="cache"
-       (load)="onLoad($event, img)">
+       (load)="onLoad()">
 </section>
