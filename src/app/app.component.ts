@@ -17,7 +17,6 @@ export class AppComponent implements OnInit {
     webFrame.setVisualZoomLevelLimits(1, 1);
     await args.wait();
     const path = args.path;
-    console.log(1, this.path);
     if (!path) {
       this.onFail();
     } else {
@@ -29,7 +28,6 @@ export class AppComponent implements OnInit {
 
   onOk() {
     getCurrentWindow().show();
-    console.log('ok');
   }
 
   onFail(e?) {

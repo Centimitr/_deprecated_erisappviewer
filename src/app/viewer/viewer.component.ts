@@ -24,6 +24,7 @@ export class ViewerComponent implements OnInit, OnChanges {
   show: boolean = false;
   elm: any;
   inView: boolean = false;
+  overflow: boolean;
   @Output() enter = new EventEmitter<null>();
   @Output() leave = new EventEmitter<null>();
   @Output() attention = new EventEmitter<null>();
@@ -68,7 +69,13 @@ export class ViewerComponent implements OnInit, OnChanges {
     });
   }
 
-  @HostListener('window:resize', ['$event']) onResize() {
+  ngAfterContentChecked() {
+    const base = this.elm.firstChild;
+    this.overflow = base.offsetHeight && base.offsetHeight < this.height;
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize() {
     this.setHeight()
   }
 
@@ -87,11 +94,5 @@ export class ViewerComponent implements OnInit, OnChanges {
 
   onLoad(e, img) {
     this.show = true;
-  }
-
-  isOverflow(base: HTMLElement) {
-    if (base.offsetHeight) {
-      return base.offsetHeight < this.height;
-    }
   }
 }

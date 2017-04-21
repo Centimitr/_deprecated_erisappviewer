@@ -1,7 +1,7 @@
 <section class="viewer" #viewer
+         [class.overflow]="overflow"
          [class.singlePage]="config.isSinglePage()"
          [class.continuousScroll]="config.isContinuousScroll()"
-         [class.overflow]="config.isSinglePage()&&isOverflow(viewer)"
          [style.height.px]="config.whenContinuousScroll(config.whenNotFullWidth(height))"
          [style.minHeight.px]="config.whenContinuousScroll(config.whenNotFullWidth(height))"
          [style.maxHeight.px]="config.whenContinuousScroll(config.whenNotFullWidth(height))">
