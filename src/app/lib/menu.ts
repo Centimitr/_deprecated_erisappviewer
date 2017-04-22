@@ -104,14 +104,6 @@ const getTemplate = function () {
       }, {
         type: 'separator'
       }, {
-        label: 'Developer Tools',
-        accelerator: 'Cmd+Alt+I',
-        click: function (item, win) {
-          if (!win.webContents.isDevToolsOpened()) {
-            win.webContents.openDevTools();
-          }
-        }
-      }, {
         type: 'separator'
       },
       {
@@ -119,6 +111,17 @@ const getTemplate = function () {
         role: 'front'
       }
     ];
+    if (1) {
+      template[3].submenu.push({
+        label: 'Developer Tools',
+        accelerator: 'Cmd+Alt+I',
+        click: function (item, win) {
+          if (!win.webContents.isDevToolsOpened()) {
+            win.webContents.openDevTools();
+          }
+        }
+      });
+    }
   }
   return Menu.buildFromTemplate(template);
 };

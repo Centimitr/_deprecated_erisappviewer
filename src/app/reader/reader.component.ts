@@ -9,11 +9,13 @@ import {
   TouchBarSegmentedControl,
   TouchBarScrubber
 } from "../lib/touchbar";
-import {ABMap, RustyLock} from "../lib/util";
+import {ABMap, LRU, RustyLock} from "../lib/util";
 import {Book} from "./book";
 import {ViewerComponent} from "../viewer/viewer.component";
 import {Config} from "./config";
 import {AppMenu} from "../lib/menu";
+import {Title} from "@angular/platform-browser";
+import {AppStorage} from "app/lib/storage";
 const fs = window['require']('fs');
 const {Menu, MenuItem} = window['require']('electron').remote;
 
@@ -39,7 +41,7 @@ export class ReaderComponent implements OnInit, OnChanges {
   @HostListener('window:contextmenu', ['$event']) onRightClick() {
   }
 
-  constructor(private zone: NgZone, private m: AppMenu) {
+  constructor(private zone: NgZone, private title: Title, private m: AppMenu, private s: AppStorage) {
     this.config = new Config();
   }
 
@@ -55,13 +57,13 @@ export class ReaderComponent implements OnInit, OnChanges {
         return;
       }
       this.ok.emit();
+      this.title.setTitle(this.book.meta.Name);
       this.viewers.changes.subscribe(() => {
         this.book.bind(this.viewers.map(v => v));
       });
 
       const barScaleMap = new ABMap(Config.SCALE_ALL);
       const barViewMap = new ABMap(Config.VIEW_ALL);
-
       const setView = i => {
         this.zone.run(() => {
           this.config.view.set(barViewMap.getB(i));
@@ -74,6 +76,11 @@ export class ReaderComponent implements OnInit, OnChanges {
       };
 
       // menu
+      const re = this.s.get('menu.recentlyEnjoyed');
+      re.set((new LRU(re.get([]), this.config.recentlyEnjoyedLen, (a, b) => a.value === b.value)).add({
+        key: this.book.meta.Name,
+        value: this.book.meta.Locator
+      }));
       const vm = this.m.view();
       const append = (vm, ...itemsArr) => {
         itemsArr.forEach(items => {
@@ -96,12 +103,13 @@ export class ReaderComponent implements OnInit, OnChanges {
         checked: barScaleMap.getA(this.config.scale.get()) === i,
       })).concat([new MenuItem({
         label: 'Zoom In',
-        accelerator: 'CmdOrCtrl+Plus'
+        accelerator: 'CmdOrCtrl+Plus',
+        click: () => this.zoom(10)
       }), new MenuItem({
         label: 'Zoom Out',
-        accelerator: 'CmdOrCtrl+-'
-      })
-      ]);
+        accelerator: 'CmdOrCtrl+-',
+        click: () => this.zoom(-10)
+      })]);
       const goItems = ['First Page', 'Previous Page', 'Next Page'].map((label, i) => new MenuItem({
         label,
         accelerator: [null, 'Left', 'Right'][i],
@@ -196,8 +204,9 @@ export class ReaderComponent implements OnInit, OnChanges {
   }
 
   zoom(percent: number) {
-    this.scale += percent;
-    console.log(this.scale)
+    setTimeout(() => {
+      this.config.scale.set(this.config.scale.get() * (100 + percent) / 100);
+    }, 0)
   }
 
   // @HostListener('window:keydown.arrowUp', ['$event'])

@@ -210,3 +210,24 @@ export class Change<T> {
     return false;
   }
 }
+
+export class LRU {
+  constructor(private q: any[], public size: number, private cmp?: Function) {
+    this.checkSize();
+  }
+
+  checkSize() {
+    this.q.splice(this.size);
+  }
+
+  add(v: any) {
+    this.q = this.q.filter(item => !this.cmp(v, item));
+    this.q.unshift(v);
+    this.checkSize();
+    return this.get();
+  }
+
+  get() {
+    return this.q;
+  }
+}

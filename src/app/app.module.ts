@@ -9,6 +9,7 @@ import {TrustResourceUrlPipe} from './trust-resource-url.pipe';
 import {ReaderComponent} from './reader/reader.component';
 import {PageHeightPipe} from './page-height.pipe';
 import {AppMenu} from "./lib/menu";
+import {AppStorage} from "./lib/storage";
 
 @NgModule({
   declarations: [
@@ -23,7 +24,7 @@ import {AppMenu} from "./lib/menu";
     FormsModule,
     HttpModule
   ],
-  providers: [AppMenu],
+  providers: [AppMenu, AppStorage],
   bootstrap: [AppComponent]
 })
 export class AppModule {

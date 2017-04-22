@@ -36,6 +36,8 @@ export class ConfigItem<T> {
 
 export class Config {
 
+  recentlyEnjoyedLen: number = 10;
+
   // appearance
   ui: object = {
     view: {
