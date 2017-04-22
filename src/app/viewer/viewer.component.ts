@@ -38,7 +38,6 @@ export class ViewerComponent implements OnInit, OnChanges {
   }
 
   scrollTo() {
-    console.log(this.elm.id);
     this.elm.scrollIntoView({
       behavior: 'smooth',
       block: 'start'

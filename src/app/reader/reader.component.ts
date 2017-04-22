@@ -13,7 +13,9 @@ import {ABMap, RustyLock} from "../lib/util";
 import {Book} from "./book";
 import {ViewerComponent} from "../viewer/viewer.component";
 import {Config} from "./config";
+import {AppMenu} from "../lib/menu";
 const fs = window['require']('fs');
+const {Menu, MenuItem} = window['require']('electron').remote;
 
 @Component({
   selector: 'reader',
@@ -37,7 +39,7 @@ export class ReaderComponent implements OnInit, OnChanges {
   @HostListener('window:contextmenu', ['$event']) onRightClick() {
   }
 
-  constructor(private zone: NgZone) {
+  constructor(private zone: NgZone, private m: AppMenu) {
     this.config = new Config();
   }
 
@@ -57,6 +59,71 @@ export class ReaderComponent implements OnInit, OnChanges {
         this.book.bind(this.viewers.map(v => v));
       });
 
+      const barScaleMap = new ABMap(Config.SCALE_ALL);
+      const barViewMap = new ABMap(Config.VIEW_ALL);
+
+      const setView = i => {
+        this.zone.run(() => {
+          this.config.view.set(barViewMap.getB(i));
+        });
+      };
+      const setScale = i => {
+        this.zone.run(() => {
+          this.config.scale.set(barScaleMap.getB(i));
+        });
+      };
+
+      // menu
+      const vm = this.m.view();
+      const append = (vm, ...itemsArr) => {
+        itemsArr.forEach(items => {
+          vm.append(new MenuItem({type: 'separator'}));
+          items.forEach(item => vm.append(item));
+        });
+      };
+      const viewItems = ['Continuous Scroll', 'Single Page'].map((label, i) => new MenuItem({
+        label,
+        accelerator: `CmdOrCtrl+${i + 1}`,
+        type: 'radio',
+        click: () => setView(i),
+        checked: barViewMap.getA(this.config.view.get()) === i,
+      }));
+      const scaleItems = ['Full Page', 'Default', 'Width FullFilled'].map((label, i) => new MenuItem({
+        label,
+        accelerator: `CmdOrCtrl+Alt+${i + 1}`,
+        type: 'radio',
+        click: () => setScale(i),
+        checked: barScaleMap.getA(this.config.scale.get()) === i,
+      })).concat([new MenuItem({
+        label: 'Zoom In',
+        accelerator: 'CmdOrCtrl+Plus'
+      }), new MenuItem({
+        label: 'Zoom Out',
+        accelerator: 'CmdOrCtrl+-'
+      })
+      ]);
+      const goItems = ['First Page', 'Previous Page', 'Next Page'].map((label, i) => new MenuItem({
+        label,
+        accelerator: [null, 'Left', 'Right'][i],
+        click: () => {
+          this.zone.run(() => {
+            switch (i) {
+              case 0:
+                this.book.go(1);
+                break;
+              case 1:
+                this.book.prev();
+                break;
+              case 2:
+                this.book.next();
+                break;
+            }
+          })
+        }
+      }));
+      append(vm, viewItems, scaleItems, goItems);
+      this.m.set();
+
       // touchBar
       const getProgressStr = (current: number = this.book.current) => current + '/' + this.book.total;
       const lock = new RustyLock();
@@ -71,27 +138,31 @@ export class ReaderComponent implements OnInit, OnChanges {
           lock.lock(175);
         }
       });
+      const viewCtrl = new TouchBarSegmentedControl({
+        segments: [
+          {label: 'Scroll'},
+          {label: 'Single'},
+        ],
+        selectedIndex: barViewMap.getA(this.config.view.get()),
+        change: i => setView(i)
+      });
+      const scaleCtrl = new TouchBarSegmentedControl({
+        segments: [
+          {label: 'Page'},
+          {label: 'Default'},
+          {label: 'Width'},
+        ],
+        selectedIndex: barScaleMap.getA(this.config.scale.get()),
+        change: i => setScale(i)
+      });
       this.book.onPage((current) => {
         lock.run(() => {
           slider.value = current;
           slider.label = getProgressStr(current);
         })
       });
-      const barScaleMap = new ABMap(Config.SCALE_ALL);
-      const barViewMap = new ABMap(Config.VIEW_ALL);
       setTouchBar([
-        new TouchBarSegmentedControl({
-          segments: [
-            {label: 'Scroll'},
-            {label: 'Single'},
-          ],
-          selectedIndex: barViewMap.getA(this.config.view.get()),
-          change: selectedIndex => {
-            this.zone.run(() => {
-              this.config.view.set(barViewMap.getB(selectedIndex));
-            });
-          }
-        }),
+        viewCtrl,
         // new TouchBarButton({label: 'Page 1', click: () => this.zone.run(() => this.book.go(1))}),
         slider,
         // new TouchBarScrubber({
@@ -100,28 +171,26 @@ export class ReaderComponent implements OnInit, OnChanges {
         //   mode: 'free',
         //   selectedStyle: 'outline',
         // }),
-        new TouchBarSegmentedControl({
-          segments: [
-            {label: 'H 100%'},
-            {label: 'Auto'},
-            {label: 'W 100%'},
-          ],
-          selectedIndex: barScaleMap.getA(this.config.scale.get()),
-          change: selectedIndex => {
-            this.zone.run(() => {
-              this.config.scale.set(barScaleMap.getB(selectedIndex));
-            });
-          }
-        }),
+        scaleCtrl,
         // new TouchBarButton({label: 'ZoomOut', click: () => this.zoom(-10)}),
       ]);
+
       this.config.view.change(n => {
+        const index = Config.VIEW_ALL.indexOf(n);
+        viewItems.filter((item, i) => i === index).forEach(item => item.checked = true);
+        viewCtrl.selectedIndex = index;
+        // hack scale
         if (n === Config.VIEW_CONTINUOUS_SCROLL) {
           const viewer = this.viewers.filter((v, i) => i + 1 === this.book.current)[0];
           setTimeout(() => {
             viewer.scrollTo();
           }, 0);
         }
+      });
+      this.config.scale.change(n => {
+        const index = Config.SCALE_ALL.indexOf(n);
+        scaleItems.filter((item, i) => i === index).forEach(item => item.checked = true);
+
       });
     }
   }
@@ -132,8 +201,8 @@ export class ReaderComponent implements OnInit, OnChanges {
   }
 
   // @HostListener('window:keydown.arrowUp', ['$event'])
+  // @HostListener('window:keydown.arrowLeft', ['$event'])
   @HostListener('window:keydown.pageUp', ['$event'])
-  @HostListener('window:keydown.arrowLeft', ['$event'])
   prev() {
     if (this.book) {
       this.zone.run(() => {
@@ -143,8 +212,8 @@ export class ReaderComponent implements OnInit, OnChanges {
   };
 
   // @HostListener('window:keydown.arrowDown', ['$event'])
+  // @HostListener('window:keydown.arrowRight', ['$event'])
   @HostListener('window:keydown.pageDown', ['$event'])
-  @HostListener('window:keydown.arrowRight', ['$event'])
   next() {
     if (this.book) {
       this.zone.run(() => {
@@ -169,6 +238,14 @@ export class ReaderComponent implements OnInit, OnChanges {
     const BACKWARD = 3;
     const FORWARD = 7;
     return -1 * BACKWARD <= distance && distance <= FORWARD;
+  }
+
+  @HostListener('click', ['$event']) onClick() {
+    this.book.next()
+  }
+
+  @HostListener('contextmenu', ['$event']) onContextMenu() {
+    this.book.prev();
   }
 
   // @HostListener('window:mousewheel', ['$event'])

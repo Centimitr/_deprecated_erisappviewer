@@ -10,9 +10,7 @@
           [cache]="inCacheRange(i+1)"
           [path]="book.getPageFilePath(p.Id)"
           [meta]="p"
-          (attention)="book.updateCurrent(i+1)"
-          (click)="book.next(i+1, true)"
-          (contextmenu)="book.prev(i+1, true)">
+          (attention)="book.updateCurrent(i+1)">
   </viewer>
 </section>
 <section class="layer">
