@@ -10,6 +10,8 @@ import {ReaderComponent} from './reader/reader.component';
 import {PageHeightPipe} from './page-height.pipe';
 import {AppMenu} from "./lib/menu";
 import {AppStorage} from "./lib/storage";
+import {CoverService} from "./cover.service";
+import {RenderService} from "./render.service";
 
 @NgModule({
   declarations: [
@@ -24,7 +26,7 @@ import {AppStorage} from "./lib/storage";
     FormsModule,
     HttpModule
   ],
-  providers: [AppMenu, AppStorage],
+  providers: [AppMenu, AppStorage, RenderService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

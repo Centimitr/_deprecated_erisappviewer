@@ -1,4 +1,3 @@
-import {BookMeta} from "./meta";
 import {ViewerComponent} from "../viewer/viewer.component";
 import {Book} from "app/reader/book";
 import {QueryList} from "@angular/core";
@@ -13,34 +12,16 @@ export interface CheckInterface {
 export class ConfigItem<T> {
   private listeners = [];
   private value: any;
-  private test: Function;
 
   constructor(v?: T) {
     this.value = v;
   }
 
-  check(v?: T): CheckInterface {
-    return this.test ? this.test(v === undefined ? this.value : v) : {ok: true};
-  }
-
   set(v: T) {
-    const r: CheckInterface = this.check(v);
-    if (!r.ok) {
-      return r.err;
-    }
     const old = this.value;
-    this.value = v;
-    if (old !== this.value) {
+    if (old !== v) {
+      this.value = v;
       this.listeners.forEach(cb => cb(this.value, old));
-    }
-    return true;
-  }
-
-  setCheck(test: Function) {
-    this.test = test;
-    const r: CheckInterface = this.check(this.value);
-    if (r.ok) {
-      this.value = r.correctedValue;
     }
   }
 
@@ -68,9 +49,9 @@ export class Config {
   // appearance
   ui: any = {
     view: {
-      before: 5,
-      after: 5,
-      intervalCorrection: 5,
+      before: 50,
+      after: 50,
+      intervalCorrection: 50,
       zoomUnit: 10
     }
   };
@@ -166,8 +147,7 @@ export class Config {
   }
 
   // mixed
-  whenNotSinglePageFullHeight(v: any) {
-    if (this.isSinglePage() && this.isFullHeight()) return;
-    return v;
+  whenSinglePageNotFullHeight(v: any) {
+    if (this.isSinglePage() && !this.isFullHeight()) return v;
   }
 }

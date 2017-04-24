@@ -1,2 +1,10 @@
 <reader [path]="path" [refresh]="refresh" (ok)="onOk()" (fail)="open()"></reader>
 <header class="titlebar" (dblclick)="zoom()" (contextmenu)="onContextMenu()">{{getTitle()}}</header>
+<!--<section class="cover" *ngIf="cover.show" #c>-->
+  <!--<img-->
+    <!--*ngIf="cover.dataUrl"-->
+    <!--[src]="cover.dataUrl"-->
+    <!--[height]="c.offsetHeight*cover.scale/100"-->
+    <!--[width]="c.offsetWidth*cover.scale/100"-->
+  <!--&gt;-->
+<!--</section>-->

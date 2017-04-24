@@ -16,6 +16,7 @@ import {CheckInterface, Config} from "./config";
 import {AppMenu} from "../lib/menu";
 import {Title} from "@angular/platform-browser";
 import {AppStorage} from "app/lib/storage";
+import {RenderService} from "../render.service";
 const fs = window['require']('fs');
 const {dialog, getCurrentWindow, Menu, MenuItem} = window['require']('electron').remote;
 
@@ -24,7 +25,7 @@ const {dialog, getCurrentWindow, Menu, MenuItem} = window['require']('electron')
   templateUrl: './reader.component.html',
   styleUrls: ['./_common.css', './_pages.css', './_layer.css'],
 })
-export class ReaderComponent implements OnInit, OnChanges {
+export class ReaderComponent implements OnChanges {
 
   @Input() path: string;
   @Input() refresh: number;
@@ -43,27 +44,6 @@ export class ReaderComponent implements OnInit, OnChanges {
   constructor(private zone: NgZone, private title: Title, private m: AppMenu, private s: AppStorage) {
     this.config = new Config();
   }
-
-  async ngOnInit() {
-    // setScaleConstraint() {
-    //   let min = 100, max = 10000;
-    //   if (this.book.meta.Pages.length && this.viewers.length) {
-    //     const containerW = this.viewers.map(v => v.elm.offsetWidth).reduce((a, b) => a > b ? a : b);
-    //     const imgMinWidth = this.book.meta.Pages.map(pm => pm.Width).reduce((a, b) => a < b ? a : b);
-    // console.log(containerW, imgMinWidth);
-    // max = 100 * containerW / imgMinWidth;
-    // }
-    // console.log('Max is', max);
-    // this.config.scale.setCheck(function (v): CheckInterface {
-    //   let ok = false, err, correctedValue;
-    //   if (v < min) [err, correctedValue] = ['smaller than min', min];
-    //   else if (v > max) [err, correctedValue] = ['bigger than max', max];
-    //   else ok = true;
-    //   return {ok, err, correctedValue};
-    // });
-    // }
-  }
-
 
   async ngOnChanges(changes) {
     if (changes.path && this.path) {
@@ -173,7 +153,8 @@ export class ReaderComponent implements OnInit, OnChanges {
         const cur = this.config.scale.get();
         const toMin = (100 - unit) / 100 * cur;
         const toMax = (100 + unit) / 100 * cur;
-        [zoomOutItem.enabled, zoomInItem.enabled] = [toMin >= min, toMax <= max];
+        const threshold = 5;
+        [zoomOutItem.enabled, zoomInItem.enabled] = [toMin - min <= threshold, max - toMax <= threshold];
       };
       this.config.scale.change(() => setZoomItemEnabled(this.config.minScale, this.config.maxScale));
       this.config.onSetScaleConstraint((min, max) => setZoomItemEnabled(min, max));
@@ -233,7 +214,7 @@ export class ReaderComponent implements OnInit, OnChanges {
         const index = Config.VIEW_ALL.indexOf(n);
         viewItems.filter((item, i) => i === index).forEach(item => item.checked = true);
         viewCtrl.selectedIndex = index;
-        // hack scale
+        // hack view change
         if (n === Config.VIEW_CONTINUOUS_SCROLL) {
           const viewer = this.viewers.filter((v, i) => i + 1 === this.book.current)[0];
           setTimeout(() => {
@@ -244,7 +225,6 @@ export class ReaderComponent implements OnInit, OnChanges {
       this.config.scale.change(n => {
         const index = Config.SCALE_ALL.indexOf(n);
         scaleItems.filter((item, i) => i === index).forEach(item => item.checked = true);
-
       });
     }
   }

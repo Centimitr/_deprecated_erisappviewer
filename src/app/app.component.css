@@ -26,3 +26,19 @@ reader {
   bottom: 0;
   left: 0;
 }
+
+/*section.cover {*/
+  /*position: fixed;*/
+  /*top: 0;*/
+  /*right: 0;*/
+  /*bottom: 0;*/
+  /*left: 0;*/
+  /*z-index: 1;*/
+  /*background-color: red;*/
+  /*display: flex;*/
+  /*align-items: center;*/
+  /*justify-content: center;*/
+/*}*/
+
+/*section.cover img {*/
+/*}*/
