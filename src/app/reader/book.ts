@@ -91,4 +91,8 @@ export class Book {
   onPage(callback: (n?: number, old?: number) => void) {
     this._onPage.push(callback);
   }
+
+  getLastReadIndex() {
+    return this.meta.Pages.map(pm => pm.Id).indexOf(this.meta.LastRead);
+  }
 }

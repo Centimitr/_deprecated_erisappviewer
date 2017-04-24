@@ -12,12 +12,12 @@ import {
 import {ABMap, LRU, RustyLock} from "../lib/util";
 import {Book} from "./book";
 import {ViewerComponent} from "../viewer/viewer.component";
-import {Config} from "./config";
+import {CheckInterface, Config} from "./config";
 import {AppMenu} from "../lib/menu";
 import {Title} from "@angular/platform-browser";
 import {AppStorage} from "app/lib/storage";
 const fs = window['require']('fs');
-const {Menu, MenuItem} = window['require']('electron').remote;
+const {dialog, getCurrentWindow, Menu, MenuItem} = window['require']('electron').remote;
 
 @Component({
   selector: 'reader',
@@ -29,7 +29,6 @@ export class ReaderComponent implements OnInit, OnChanges {
   @Input() path: string;
   @Input() refresh: number;
   book: Book;
-  scale: number = 133;
   config: Config;
   @Output() ok = new EventEmitter<null>();
   @Output() fail = new EventEmitter<any>();
@@ -46,10 +45,28 @@ export class ReaderComponent implements OnInit, OnChanges {
   }
 
   async ngOnInit() {
+    // setScaleConstraint() {
+    //   let min = 100, max = 10000;
+    //   if (this.book.meta.Pages.length && this.viewers.length) {
+    //     const containerW = this.viewers.map(v => v.elm.offsetWidth).reduce((a, b) => a > b ? a : b);
+    //     const imgMinWidth = this.book.meta.Pages.map(pm => pm.Width).reduce((a, b) => a < b ? a : b);
+    // console.log(containerW, imgMinWidth);
+    // max = 100 * containerW / imgMinWidth;
+    // }
+    // console.log('Max is', max);
+    // this.config.scale.setCheck(function (v): CheckInterface {
+    //   let ok = false, err, correctedValue;
+    //   if (v < min) [err, correctedValue] = ['smaller than min', min];
+    //   else if (v > max) [err, correctedValue] = ['bigger than max', max];
+    //   else ok = true;
+    //   return {ok, err, correctedValue};
+    // });
+    // }
   }
 
+
   async ngOnChanges(changes) {
-    if (changes.path && this.path || this.refresh) {
+    if (changes.path && this.path) {
       this.book = new Book(this.path, this.config);
       let e = await this.book.init();
       if (e) {
@@ -61,7 +78,24 @@ export class ReaderComponent implements OnInit, OnChanges {
       this.viewers.changes.subscribe(() => {
         this.book.bind(this.viewers.map(v => v));
       });
+      setTimeout(() => this.config.setMaxScale(this.book, this.viewers), 0);
 
+      // turn to specific page
+      if (this.book.meta.LastRead) {
+        const page = this.book.getLastReadIndex();
+        const shouldTurn = dialog.showMessageBox(getCurrentWindow(), {
+            type: 'question',
+            message: `Turn to Page${page}`,
+            detail: `You may opened the book via Page${page}, 'OK' to turn that page rather than Page1.`,
+            buttons: ['Yes', 'Cancel'],
+            cancelId: 1
+          }) === 0;
+        if (shouldTurn) {
+          this.book.go(page);
+        }
+      }
+
+      // scale and view
       const barScaleMap = new ABMap(Config.SCALE_ALL);
       const barViewMap = new ABMap(Config.VIEW_ALL);
       const setView = i => {
@@ -78,10 +112,11 @@ export class ReaderComponent implements OnInit, OnChanges {
       // menu
       const re = this.s.get('menu.recentlyEnjoyed');
       re.set((new LRU(re.get([]), this.config.recentlyEnjoyedLen, (a, b) => a.value === b.value)).add({
-        key: this.book.meta.Name,
+        key: this.book.meta.Name || this.book.meta.Locator,
         value: this.book.meta.Locator
       }));
       const vm = this.m.view();
+      vm.clear();
       const append = (vm, ...itemsArr) => {
         itemsArr.forEach(items => {
           vm.append(new MenuItem({type: 'separator'}));
@@ -102,11 +137,11 @@ export class ReaderComponent implements OnInit, OnChanges {
         click: () => setScale(i),
         checked: barScaleMap.getA(this.config.scale.get()) === i,
       })).concat([new MenuItem({
-        label: 'Zoom In',
+        label: '! Zoom In',
         accelerator: 'CmdOrCtrl+Plus',
         click: () => this.zoom(10)
       }), new MenuItem({
-        label: 'Zoom Out',
+        label: '! Zoom Out',
         accelerator: 'CmdOrCtrl+-',
         click: () => this.zoom(-10)
       })]);
@@ -233,6 +268,7 @@ export class ReaderComponent implements OnInit, OnChanges {
 
   @HostListener('window:resize', ['$event']) onResize() {
     console.warn('RESIZED!');
+    this.config.setMaxScale(this.book, this.viewers);
   }
 
   inCacheRange(page: number): boolean {

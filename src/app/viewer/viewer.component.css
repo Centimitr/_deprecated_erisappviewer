@@ -70,3 +70,7 @@ img {
 img.visible {
   /*opacity: 1;*/
 }
+
+.viewer, img {
+  transition: 275ms ease-in-out;
+}

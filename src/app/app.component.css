@@ -1,10 +1,22 @@
 .titlebar {
-  height: 28px;
+  height: 38px;
   -webkit-app-region: drag;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
+  opacity: 0;
+  text-align: center;
+  font-size: 14px;
+  line-height: 38px;
+  color: #ccc;
+  text-shadow: 0 0 1px black;
+  transition: opacity 125ms ease-in-out;
+}
+
+.titlebar:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.9);
 }
 
 reader {

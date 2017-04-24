@@ -16,10 +16,5 @@ viewer {
   width: 100%;
 }
 
-.pages.singlePage viewer {}
-
-.pages.continuousScroll viewer + viewer {
-  margin-top: 7vh;
-}
 
 

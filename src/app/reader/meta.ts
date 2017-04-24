@@ -12,5 +12,6 @@ export class BookMeta {
   Name: string;
   Author: string;
   Publisher: string;
-  Pages: PageMeta[]
+  Pages: PageMeta[];
+  LastRead: string;
 }

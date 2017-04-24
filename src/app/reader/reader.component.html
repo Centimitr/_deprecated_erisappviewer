@@ -1,7 +1,6 @@
-<section class="pages" #pages
-         [class.singlePage]="config.isSinglePage()"
-         [class.continuousScroll]="config.isContinuousScroll()">
+<section class="pages" #pages>
   <viewer #page *ngFor="let p of book?.meta?.Pages; let i = index;"
+          [style.marginTop.vh]="i===0?0:-1*config.ui.view.intervalCorrection"
           [config]="config"
           [hidden]="config.isContinuousScroll()? false: (i+1!==book.current)"
           [id]="'page-'+(i+1)"
@@ -15,6 +14,6 @@
 </section>
 <section class="layer">
   <section class="panel progress" *ngIf="book?.total">
-    {{book?.current}} / {{book?.total}}
+    {{book?.current}}<span style="opacity: 0.75;margin: 0 2px 0 4px;">/</span>{{book?.total}}
   </section>
 </section>

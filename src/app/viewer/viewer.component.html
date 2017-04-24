@@ -1,10 +1,8 @@
 <section class="viewer" #viewer
          [class.overflow]="overflow | async"
          [class.singlePage]="config.isSinglePage()"
-         [class.continuousScroll]="config.isContinuousScroll()"
-         [style.height.px]="config.whenContinuousScroll(config.whenNotFullWidth(height))"
-         [style.minHeight.px]="config.whenContinuousScroll(config.whenNotFullWidth(height))"
-         [style.maxHeight.px]="config.whenContinuousScroll(config.whenNotFullWidth(height))">
+         [class.continuousScroll]="config.isContinuousScroll()">
+  <!--[style.maxHeight.px]="config.whenContinuousScroll(config.whenNotFullWidth(height))">-->
   <div class="loading">
     <div class="words">
       <div class="page">Page {{page}}</div>
@@ -13,8 +11,8 @@
     </div>
   </div>
   <img #img [src]="path"
-       [style.marginTop.vh]="config.whenSinglePage(config.whenNotFullHeight(config.ui.view.singlePage.before))"
-       [style.marginBottom.vh]="config.whenSinglePage(config.whenNotFullHeight(config.ui.view.singlePage.after))"
+       [style.marginTop.vh]="config.whenNotSinglePageFullHeight(config.ui.view.before)"
+       [style.marginBottom.vh]="config.whenNotSinglePageFullHeight(config.ui.view.after)"
        [style.maxHeight.px]="config.whenNotFullWidth(height)"
        [style.minWidth.%]="config.whenFullWidth(100)"
        [style.width.%]="config.whenFullWidth(100)"

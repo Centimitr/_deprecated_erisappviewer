@@ -15,11 +15,7 @@ const getTemplate = function () {
     },
     {
       label: 'View',
-      submenu: [
-        {
-          role: 'togglefullscreen'
-        }
-      ]
+      submenu: []
     },
     {
       role: 'window',
@@ -90,23 +86,29 @@ const getTemplate = function () {
         accelerator: 'CmdOrCtrl+M',
         role: 'minimize'
       }, {
+        role: 'togglefullscreen'
+      }, {
+        type: 'separator'
+      }, {
         label: 'Zoom',
         accelerator: 'Ctrl+Cmd+=',
         role: 'zoom'
       }, {
-        label: 'Always On Top',
+        label: 'Center',
+        click(item, win){
+          win.center();
+        }
+      }, {
+        label: 'Always on Top',
         type: 'checkbox',
         checked: false,
-        click: function (item, win) {
+        click(item, win) {
           win.setAlwaysOnTop(!win.isAlwaysOnTop());
           item.checked = win.isAlwaysOnTop();
         }
       }, {
         type: 'separator'
       }, {
-        type: 'separator'
-      },
-      {
         label: 'Bring All to Front',
         role: 'front'
       }
@@ -115,11 +117,7 @@ const getTemplate = function () {
       template[3].submenu.push({
         label: 'Developer Tools',
         accelerator: 'Cmd+Alt+I',
-        click: function (item, win) {
-          if (!win.webContents.isDevToolsOpened()) {
-            win.webContents.openDevTools();
-          }
-        }
+        role: 'toggledevtools'
       });
     }
   }

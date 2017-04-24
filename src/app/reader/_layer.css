@@ -9,13 +9,14 @@
 
 .layer .panel {
   position: absolute;
-  background-color: #222;
+  background-color: #111;
   border-radius: 10px;
-  color: #ccc;
-  opacity: 0.8;
-  padding: 10px 14px 8px 14px;
-  font-family: 'Monaco', sans-serif;
-  font-size: 14px;
+  border: 1px solid #222;
+  color: #999;
+  padding: 9px 12px 7px 12px;
+  font-family: 'Osaka', sans-serif;
+  text-shadow: 0 0 2px black;
+  font-size: 16px;
 }
 
 .progress {

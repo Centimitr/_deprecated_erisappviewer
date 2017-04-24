@@ -1,2 +1,2 @@
 <reader [path]="path" [refresh]="refresh" (ok)="onOk()" (fail)="open()"></reader>
-<header class="titlebar"></header>
+<header class="titlebar" (dblclick)="zoom()" (contextmenu)="onContextMenu()">{{getTitle()}}</header>
