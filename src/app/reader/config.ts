@@ -66,20 +66,12 @@ export class Config {
   recentlyEnjoyedLen: number = 10;
 
   // appearance
-  ui: object = {
+  ui: any = {
     view: {
-      continuousScroll: {
-        before: 5,
-        interval: 0,
-        after: 0,
-      },
-      singlePage: {
-        before: 5,
-        after: 5
-      },
       before: 5,
       after: 5,
-      intervalCorrection: 5
+      intervalCorrection: 5,
+      zoomUnit: 10
     }
   };
 
@@ -89,13 +81,29 @@ export class Config {
   static SCALE_FULL_HEIGHT: number = 100;
   static SCALE_FULL_WIDTH: number = Infinity;
   static SCALE_ALL: number[] = [Config.SCALE_FULL_HEIGHT, Config.SCALE_DEFAULT, Config.SCALE_FULL_WIDTH];
+  minScale: number = 100;
   maxScale: number = 100000;
+  private _onSetScaleConstraint: Function[] = [];
 
-  setMaxScale(book: Book, viewers: QueryList<ViewerComponent>) {
+  onSetScaleConstraint(cb: Function) {
+    this._onSetScaleConstraint.push(cb);
+  }
+
+  checkScale(s: number): boolean {
+    return this.minScale < s && s < this.maxScale;
+  }
+
+  setScaleConstraint(book: Book, viewers: QueryList<ViewerComponent>) {
     if (book.meta.Pages.length && viewers.length) {
-      const containerW = viewers.map(v => v.elm.offsetWidth).reduce((a, b) => a > b ? a : b);
-      const imgMinWidth = book.meta.Pages.map(pm => pm.Width).reduce((a, b) => a < b ? a : b);
-      this.maxScale = 100 * containerW / imgMinWidth;
+      const vw = viewers.map(v => v.elm.offsetWidth).reduce((a, b) => a > b ? a : b);
+      const vh = viewers.map(v => v.elm.offsetHeight).reduce((a, b) => a > b ? a : b);
+      const imgMinW = book.meta.Pages.map(pm => pm.Width).reduce((a, b) => a < b ? a : b);
+      const imgMinH = book.meta.Pages.map(pm => pm.Height).reduce((a, b) => a < b ? a : b);
+      this.maxScale = 100 * vw / imgMinW;
+      const MIN_HEIGHT_PROPORTION = 65;
+      const MIN_WIDTH_PROPORTION = 35;
+      this.minScale = Math.max(MIN_HEIGHT_PROPORTION * vh / imgMinH, MIN_WIDTH_PROPORTION * vw / imgMinW);
+      this._onSetScaleConstraint.forEach(cb => cb(this.minScale, this.maxScale));
     }
   }
 

@@ -78,7 +78,7 @@ export class ReaderComponent implements OnInit, OnChanges {
       this.viewers.changes.subscribe(() => {
         this.book.bind(this.viewers.map(v => v));
       });
-      setTimeout(() => this.config.setMaxScale(this.book, this.viewers), 0);
+      setTimeout(() => this.config.setScaleConstraint(this.book, this.viewers), 0);
 
       // turn to specific page
       if (this.book.meta.LastRead) {
@@ -130,21 +130,23 @@ export class ReaderComponent implements OnInit, OnChanges {
         click: () => setView(i),
         checked: barViewMap.getA(this.config.view.get()) === i,
       }));
+      const zoomInItem = new MenuItem({
+        label: '! Zoom In',
+        accelerator: 'CmdOrCtrl+Plus',
+        click: () => this.zoom(this.config.ui.view.zoomUnit)
+      });
+      const zoomOutItem = new MenuItem({
+        label: '! Zoom Out',
+        accelerator: 'CmdOrCtrl+-',
+        click: () => this.zoom(-1 * this.config.ui.view.zoomUnit)
+      });
       const scaleItems = ['Full Page', 'Default', 'Width FullFilled'].map((label, i) => new MenuItem({
         label,
         accelerator: `CmdOrCtrl+Alt+${i + 1}`,
         type: 'radio',
         click: () => setScale(i),
         checked: barScaleMap.getA(this.config.scale.get()) === i,
-      })).concat([new MenuItem({
-        label: '! Zoom In',
-        accelerator: 'CmdOrCtrl+Plus',
-        click: () => this.zoom(10)
-      }), new MenuItem({
-        label: '! Zoom Out',
-        accelerator: 'CmdOrCtrl+-',
-        click: () => this.zoom(-10)
-      })]);
+      })).concat([zoomInItem, zoomOutItem]);
       const goItems = ['First Page', 'Previous Page', 'Next Page'].map((label, i) => new MenuItem({
         label,
         accelerator: [null, 'Left', 'Right'][i],
@@ -166,6 +168,15 @@ export class ReaderComponent implements OnInit, OnChanges {
       }));
       append(vm, viewItems, scaleItems, goItems);
       this.m.set();
+      const setZoomItemEnabled = (min: number, max: number) => {
+        const unit = this.config.ui.view.zoomUnit;
+        const cur = this.config.scale.get();
+        const toMin = (100 - unit) / 100 * cur;
+        const toMax = (100 + unit) / 100 * cur;
+        [zoomOutItem.enabled, zoomInItem.enabled] = [toMin >= min, toMax <= max];
+      };
+      this.config.scale.change(() => setZoomItemEnabled(this.config.minScale, this.config.maxScale));
+      this.config.onSetScaleConstraint((min, max) => setZoomItemEnabled(min, max));
 
       // touchBar
       const getProgressStr = (current: number = this.book.current) => current + '/' + this.book.total;
@@ -268,7 +279,7 @@ export class ReaderComponent implements OnInit, OnChanges {
 
   @HostListener('window:resize', ['$event']) onResize() {
     console.warn('RESIZED!');
-    this.config.setMaxScale(this.book, this.viewers);
+    this.config.setScaleConstraint(this.book, this.viewers);
   }
 
   inCacheRange(page: number): boolean {
