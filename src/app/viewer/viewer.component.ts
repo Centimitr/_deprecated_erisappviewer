@@ -5,9 +5,6 @@ import {
 import {PageMeta} from "../reader/meta";
 import {Change, Checker, Semaphore} from "../lib/util";
 import {Config} from "../reader/config";
-const getWindowSize = () => {
-  return [window.innerWidth, window.innerHeight];
-};
 
 @Component({
   selector: 'viewer',
@@ -25,16 +22,17 @@ export class ViewerComponent implements OnInit, OnChanges {
   elm: any;
   inView: boolean = false;
   overflow: Promise<boolean>;
-  resolveOverflow: Function;
+  o: boolean = false;
   @Output() enter = new EventEmitter<null>();
   @Output() leave = new EventEmitter<null>();
   @Output() attention = new EventEmitter<null>();
   c = new Change<string>();
+  private img: HTMLImageElement;
 
   constructor(elm: ElementRef, private zone: NgZone) {
     this.elm = elm.nativeElement;
     this.elm.addEventListener('ready', e => console.log(e));
-    this.overflow = new Promise<boolean>(resolve => this.resolveOverflow = resolve);
+    this.overflow = new Promise<boolean>(r => 0);
   }
 
   scrollTo() {
@@ -42,6 +40,11 @@ export class ViewerComponent implements OnInit, OnChanges {
       behavior: 'smooth',
       block: 'start'
     });
+  }
+
+  onLoad(img: HTMLImageElement) {
+    this.show = true;
+    this.img = img;
   }
 
   async ngOnInit() {
@@ -73,49 +76,40 @@ export class ViewerComponent implements OnInit, OnChanges {
     });
     io.observe(this.elm);
     this.setHeight();
-    this.config.scale.change(() => {
-      this.zone.run(() => {
-        this.setHeight();
-      })
-    });
+    this.config.mode.change(() => this.zone.run(() => this.setHeight()));
+    this.config.scale.change(() => this.zone.run(() => this.setHeight()));
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize() {
+  @HostListener('window:resize', ['$event']) onResize() {
     this.setHeight();
   }
 
   setHeight() {
     const pages: HTMLElement = this.elm.parentElement;
     const p = this.meta;
-    const xScale = 100;
-    const yScale = this.config.scale.get();
-    const [w, h] = [xScale / 100 * pages.offsetWidth, yScale / 100 * pages.offsetHeight];
-    const scale = Math.min(1, w / p.Width, h / p.Height);
-    return this.height = p.Height * scale;
+    if (this.config.mode.is(Config.MODE_FULL_HEIGHT)) {
+      this.height = pages.offsetHeight;
+    } else {
+      const xScale = 100;
+      const yScale = this.config.scale.get();
+      const [w, h] = [xScale / 100 * pages.offsetWidth, yScale / 100 * pages.offsetHeight];
+      const scale = Math.min(1, w / p.Width, h / p.Height);
+      this.height = p.Height * scale;
+    }
   }
 
   ngOnChanges(changes) {
   }
 
-  checkOverflow() {
-    const h = this.elm.parentElement.offsetHeight;
-    const changed = this.c.changed(`${h}.${this.height}`);
-    if (changed && h) {
-      this.overflow = new Promise<boolean>(r => r(h < this.height));
-    }
-  }
-
-  ngAfterContentChecked() {
-    this.checkOverflow();
-  }
-
-  onLoad() {
-    this.show = true;
+  isOverflow() {
+    if (!this.config.view.is(Config.VIEW_SINGLE_PAGE)) return false;
+    else if (this.config.mode.is(Config.MODE_FULL_HEIGHT)) return false;
+    else if (!this.img) return false;
+    else return this.img.height > this.elm.parentElement.offsetHeight;
   }
 
   getPos() {
-    const top = this.elm.getBoundingClientRect().top;
-    console.log(this.elm.getBoundingClientRect());
+    // const top = this.elm.getBoundingClientRect().top;
+    // console.log(this.elm.getBoundingClientRect());
   }
 }

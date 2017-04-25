@@ -142,7 +142,7 @@ export class Config {
   }
 
   isFullWidth(): boolean {
-    return this.scale.is(Config.MODE_FULL_WIDTH);
+    return this.mode.is(Config.MODE_FULL_WIDTH);
   }
 
   whenFullWidth(v: any): boolean {
@@ -158,7 +158,7 @@ export class Config {
   }
 
   isFullHeight(): boolean {
-    return this.scale.is(Config.MODE_FULL_HEIGHT);
+    return this.mode.is(Config.MODE_FULL_HEIGHT);
   }
 
   whenFullHeight(v: any): boolean {
