@@ -113,4 +113,9 @@ export class ViewerComponent implements OnInit, OnChanges {
   onLoad() {
     this.show = true;
   }
+
+  getPos() {
+    const top = this.elm.getBoundingClientRect().top;
+    console.log(this.elm.getBoundingClientRect());
+  }
 }

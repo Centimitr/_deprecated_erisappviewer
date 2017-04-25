@@ -11,22 +11,38 @@ export interface CheckInterface {
 
 export class ConfigItem<T> {
   private listeners = [];
-  private value: any;
+  protected value: any;
+  private _lock: boolean = false;
 
   constructor(v?: T) {
     this.value = v;
   }
 
-  set(v: T) {
+  set(v: T): boolean {
+    if (this._lock) return false;
+
     const old = this.value;
     if (old !== v) {
       this.value = v;
       this.listeners.forEach(cb => cb(this.value, old));
     }
+    return true;
   }
 
   get(): T {
     return this.value;
+  }
+
+  lock() {
+    this._lock = true;
+  }
+
+  unlock() {
+    this._lock = false;
+  }
+
+  clear() {
+    this.listeners = [];
   }
 
   change(cb: Function) {
@@ -42,9 +58,36 @@ export class ConfigItem<T> {
   }
 }
 
+export class ConfigRangedItem extends ConfigItem<number> {
+  public min: number;
+  public max: number;
+
+  constructor(v: number, min: number, max: number) {
+    super(v);
+    [this.min, this.max] = [min, max];
+  }
+
+  setRange(min, max) {
+    if (min >= max) console.error('min should be smaller than max');
+    [this.min, this.max] = [min, max];
+    if (this.value < this.min) this.set(this.min);
+    else if (this.value > this.max) this.set(this.max);
+  }
+
+  inRange(v: number) {
+    return this.min <= v && v <= this.max;
+  }
+
+  set(v: number): boolean {
+    if (this.inRange(v)) return super.set(v);
+    else return false;
+  }
+}
+
 export class Config {
 
   recentlyEnjoyedLen: number = 10;
+  natureScroll: boolean = true;
 
   // appearance
   ui: any = {
@@ -56,22 +99,40 @@ export class Config {
     }
   };
 
+  clear() {
+    this.pinch.clear();
+    this.scale.clear();
+    this.view.clear();
+  }
+
+  pinch = new ConfigItem<number>(1);
+
   // scale
-  scale = new ConfigItem<number>(Config.SCALE_DEFAULT);
   static SCALE_DEFAULT: number = 150;
   static SCALE_FULL_HEIGHT: number = 100;
   static SCALE_FULL_WIDTH: number = Infinity;
   static SCALE_ALL: number[] = [Config.SCALE_FULL_HEIGHT, Config.SCALE_DEFAULT, Config.SCALE_FULL_WIDTH];
-  minScale: number = 100;
-  maxScale: number = 100000;
+  scale = new ConfigRangedItem(Config.SCALE_DEFAULT, 100, 100000);
+
   private _onSetScaleConstraint: Function[] = [];
 
   onSetScaleConstraint(cb: Function) {
     this._onSetScaleConstraint.push(cb);
   }
 
-  checkScale(s: number): boolean {
-    return this.minScale < s && s < this.maxScale;
+  setFullHeight() {
+    this.scale.lock();
+    return this.scale.set(Config.SCALE_FULL_HEIGHT);
+  }
+
+  setFullWidth() {
+    this.scale.lock();
+    return this.scale.set(Config.SCALE_FULL_WIDTH);
+  }
+
+  setDefault() {
+    this.scale.unlock();
+    return this.scale.set(Config.SCALE_DEFAULT);
   }
 
   setScaleConstraint(book: Book, viewers: QueryList<ViewerComponent>) {
@@ -80,11 +141,10 @@ export class Config {
       const vh = viewers.map(v => v.elm.offsetHeight).reduce((a, b) => a > b ? a : b);
       const imgMinW = book.meta.Pages.map(pm => pm.Width).reduce((a, b) => a < b ? a : b);
       const imgMinH = book.meta.Pages.map(pm => pm.Height).reduce((a, b) => a < b ? a : b);
-      this.maxScale = 100 * vw / imgMinW;
       const MIN_HEIGHT_PROPORTION = 65;
       const MIN_WIDTH_PROPORTION = 35;
-      this.minScale = Math.max(MIN_HEIGHT_PROPORTION * vh / imgMinH, MIN_WIDTH_PROPORTION * vw / imgMinW);
-      this._onSetScaleConstraint.forEach(cb => cb(this.minScale, this.maxScale));
+      this.scale.setRange(Math.max(MIN_HEIGHT_PROPORTION * vh / imgMinH, MIN_WIDTH_PROPORTION * vw / imgMinW), 100 * vw / imgMinW);
+      this._onSetScaleConstraint.forEach(cb => cb(this.scale.min, this.scale.max));
     }
   }
 

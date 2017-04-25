@@ -72,5 +72,5 @@ img.visible {
 }
 
 .viewer, img {
-  transition: 275ms ease-in-out;
+  transition: 50ms ease-in-out;
 }

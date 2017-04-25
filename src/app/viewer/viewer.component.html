@@ -2,7 +2,7 @@
          [class.overflow]="overflow | async"
          [class.singlePage]="config.isSinglePage()"
          [class.continuousScroll]="config.isContinuousScroll()"
-         [style.height.px]="config.whenContinuousScroll(height)">
+         [style.height.px]="config.whenContinuousScroll(height)+config.whenSinglePage(height+config.ui.view.before+config.ui.view.after)">
   <div class="loading">
     <div class="words">
       <div class="page">Page {{page}}</div>

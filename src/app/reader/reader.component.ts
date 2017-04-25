@@ -1,6 +1,6 @@
 import {
   Component, OnInit, Input, HostListener, NgZone, OnChanges, ViewChildren, QueryList,
-  Output, EventEmitter
+  Output, EventEmitter, ElementRef
 } from '@angular/core';
 import {
   setTouchBar,
@@ -33,6 +33,7 @@ export class ReaderComponent implements OnChanges {
   config: Config;
   @Output() ok = new EventEmitter<null>();
   @Output() fail = new EventEmitter<any>();
+  elm: HTMLElement;
 
   @ViewChildren(ViewerComponent) viewers: QueryList<ViewerComponent>;
 
@@ -41,7 +42,8 @@ export class ReaderComponent implements OnChanges {
   @HostListener('window:contextmenu', ['$event']) onRightClick() {
   }
 
-  constructor(private zone: NgZone, private title: Title, private m: AppMenu, private s: AppStorage) {
+  constructor(private zone: NgZone, private title: Title, private m: AppMenu, private s: AppStorage, elm: ElementRef) {
+    this.elm = elm.nativeElement;
     this.config = new Config();
   }
 
@@ -58,7 +60,12 @@ export class ReaderComponent implements OnChanges {
       this.viewers.changes.subscribe(() => {
         this.book.bind(this.viewers.map(v => v));
       });
+      this.config.clear();
       setTimeout(() => this.config.setScaleConstraint(this.book, this.viewers), 0);
+      // temp limit
+      // if (this.config.scale.get() < this.config.scale.max) {
+      //   this.config.scale.set(this.config.scale);
+      // }
 
       // turn to specific page
       if (this.book.meta.LastRead) {
@@ -78,16 +85,14 @@ export class ReaderComponent implements OnChanges {
       // scale and view
       const barScaleMap = new ABMap(Config.SCALE_ALL);
       const barViewMap = new ABMap(Config.VIEW_ALL);
-      const setView = i => {
-        this.zone.run(() => {
-          this.config.view.set(barViewMap.getB(i));
-        });
-      };
-      const setScale = i => {
-        this.zone.run(() => {
-          this.config.scale.set(barScaleMap.getB(i));
-        });
-      };
+
+      //pinch
+      this.config.pinch.change(v => {
+        // this.config.scale.set();
+        const to = this.config.scale.get() * ((v - 1) * 0.5 + 1);
+        this.config.scale.set(to);
+        console.log(to);
+      });
 
       // menu
       const re = this.s.get('menu.recentlyEnjoyed');
@@ -107,7 +112,11 @@ export class ReaderComponent implements OnChanges {
         label,
         accelerator: `CmdOrCtrl+${i + 1}`,
         type: 'radio',
-        click: () => setView(i),
+        click: i => {
+          this.zone.run(() => {
+            this.config.view.set(barViewMap.getB(i));
+          });
+        },
         checked: barViewMap.getA(this.config.view.get()) === i,
       }));
       const zoomInItem = new MenuItem({
@@ -124,7 +133,12 @@ export class ReaderComponent implements OnChanges {
         label,
         accelerator: `CmdOrCtrl+Alt+${i + 1}`,
         type: 'radio',
-        click: () => setScale(i),
+        click: i => {
+          this.zone.run(() => {
+            this.config.scale.set(barScaleMap.getB(i));
+            if
+          });
+        },
         checked: barScaleMap.getA(this.config.scale.get()) === i,
       })).concat([zoomInItem, zoomOutItem]);
       const goItems = ['First Page', 'Previous Page', 'Next Page'].map((label, i) => new MenuItem({
@@ -156,7 +170,7 @@ export class ReaderComponent implements OnChanges {
         const threshold = 5;
         [zoomOutItem.enabled, zoomInItem.enabled] = [toMin - min <= threshold, max - toMax <= threshold];
       };
-      this.config.scale.change(() => setZoomItemEnabled(this.config.minScale, this.config.maxScale));
+      this.config.scale.change(() => setZoomItemEnabled(this.config.scale.min, this.config.scale.max));
       this.config.onSetScaleConstraint((min, max) => setZoomItemEnabled(min, max));
 
       // touchBar
@@ -214,9 +228,10 @@ export class ReaderComponent implements OnChanges {
         const index = Config.VIEW_ALL.indexOf(n);
         viewItems.filter((item, i) => i === index).forEach(item => item.checked = true);
         viewCtrl.selectedIndex = index;
+        const viewer = this.viewers.filter((v, i) => i + 1 === this.book.current)[0];
+        viewer.getPos();
         // hack view change
         if (n === Config.VIEW_CONTINUOUS_SCROLL) {
-          const viewer = this.viewers.filter((v, i) => i + 1 === this.book.current)[0];
           setTimeout(() => {
             viewer.scrollTo();
           }, 0);
@@ -284,12 +299,14 @@ export class ReaderComponent implements OnChanges {
     this.book.prev();
   }
 
-  // @HostListener('window:mousewheel', ['$event'])
-  // async onWheel(e) {
-  // if (e.deltaY > 0) {
-  //   await this.next();
-  // } else {
-  //   await this.prev();
-  // }
-  // }
+  @HostListener('window:mousewheel', ['$event'])
+  async onWheel(e) {
+    e.preventDefault();
+    if (e.ctrlKey) {
+      this.config.pinch.set(Math.exp(-e.deltaY / 100));
+    } else {
+      const direction = this.config.natureScroll ? 1 : -1;
+      this.elm.firstElementChild.scrollTop += e.deltaY * direction;
+    }
+  }
 }
