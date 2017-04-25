@@ -33,6 +33,10 @@ export class ConfigItem<T> {
     return this.value;
   }
 
+  is(v: T): boolean {
+    return this.value === v;
+  }
+
   lock() {
     this._lock = true;
   }
@@ -101,38 +105,27 @@ export class Config {
 
   clear() {
     this.pinch.clear();
-    this.scale.clear();
+    this.mode.clear();
+    // this.mode.clear();
     this.view.clear();
   }
 
   pinch = new ConfigItem<number>(1);
 
-  // scale
-  static SCALE_DEFAULT: number = 150;
-  static SCALE_FULL_HEIGHT: number = 100;
-  static SCALE_FULL_WIDTH: number = Infinity;
-  static SCALE_ALL: number[] = [Config.SCALE_FULL_HEIGHT, Config.SCALE_DEFAULT, Config.SCALE_FULL_WIDTH];
-  scale = new ConfigRangedItem(Config.SCALE_DEFAULT, 100, 100000);
+  // mode
+  mode = new ConfigItem<number>(Config.MODE_DEFAULT);
+  static MODE_DEFAULT: number = 0;
+  static MODE_FULL_HEIGHT: number = 1;
+  static MODE_FULL_WIDTH: number = 2;
+  static MODE_ALL: number[] = [Config.MODE_FULL_HEIGHT, Config.MODE_DEFAULT, Config.MODE_FULL_WIDTH];
 
+  // scale
+  defaultScale: number = 150;
+  scale = new ConfigRangedItem(this.defaultScale, 100, 100000);
   private _onSetScaleConstraint: Function[] = [];
 
   onSetScaleConstraint(cb: Function) {
     this._onSetScaleConstraint.push(cb);
-  }
-
-  setFullHeight() {
-    this.scale.lock();
-    return this.scale.set(Config.SCALE_FULL_HEIGHT);
-  }
-
-  setFullWidth() {
-    this.scale.lock();
-    return this.scale.set(Config.SCALE_FULL_WIDTH);
-  }
-
-  setDefault() {
-    this.scale.unlock();
-    return this.scale.set(Config.SCALE_DEFAULT);
   }
 
   setScaleConstraint(book: Book, viewers: QueryList<ViewerComponent>) {
@@ -149,7 +142,7 @@ export class Config {
   }
 
   isFullWidth(): boolean {
-    return this.scale.get() === Config.SCALE_FULL_WIDTH;
+    return this.scale.is(Config.MODE_FULL_WIDTH);
   }
 
   whenFullWidth(v: any): boolean {
@@ -165,7 +158,7 @@ export class Config {
   }
 
   isFullHeight(): boolean {
-    return this.scale.get() === Config.SCALE_FULL_HEIGHT;
+    return this.scale.is(Config.MODE_FULL_HEIGHT);
   }
 
   whenFullHeight(v: any): boolean {

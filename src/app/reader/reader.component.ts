@@ -83,15 +83,25 @@ export class ReaderComponent implements OnChanges {
       }
 
       // scale and view
-      const barScaleMap = new ABMap(Config.SCALE_ALL);
+      const barModeMap = new ABMap(Config.MODE_ALL);
       const barViewMap = new ABMap(Config.VIEW_ALL);
-
+      const setView = i => {
+        this.zone.run(() => {
+          this.config.view.set(barViewMap.getB(i));
+        });
+      };
+      const setMode = i => {
+        this.zone.run(() => {
+          this.config.mode.set(barModeMap.getB(i));
+        });
+      };
       //pinch
       this.config.pinch.change(v => {
         // this.config.scale.set();
-        const to = this.config.scale.get() * ((v - 1) * 0.5 + 1);
-        this.config.scale.set(to);
-        console.log(to);
+        if (this.config.mode.is(Config.MODE_DEFAULT)) {
+          const to = this.config.scale.get() * ((v - 1) * 0.5 + 1);
+          this.config.scale.set(to);
+        }
       });
 
       // menu
@@ -112,11 +122,7 @@ export class ReaderComponent implements OnChanges {
         label,
         accelerator: `CmdOrCtrl+${i + 1}`,
         type: 'radio',
-        click: i => {
-          this.zone.run(() => {
-            this.config.view.set(barViewMap.getB(i));
-          });
-        },
+        click: setView,
         checked: barViewMap.getA(this.config.view.get()) === i,
       }));
       const zoomInItem = new MenuItem({
@@ -129,17 +135,12 @@ export class ReaderComponent implements OnChanges {
         accelerator: 'CmdOrCtrl+-',
         click: () => this.zoom(-1 * this.config.ui.view.zoomUnit)
       });
-      const scaleItems = ['Full Page', 'Default', 'Width FullFilled'].map((label, i) => new MenuItem({
+      const modeItems = ['Full Page', 'Default', 'Width FullFilled'].map((label, i) => new MenuItem({
         label,
         accelerator: `CmdOrCtrl+Alt+${i + 1}`,
         type: 'radio',
-        click: i => {
-          this.zone.run(() => {
-            this.config.scale.set(barScaleMap.getB(i));
-            if
-          });
-        },
-        checked: barScaleMap.getA(this.config.scale.get()) === i,
+        click: setMode,
+        checked: barModeMap.getA(this.config.mode.get()) === i
       })).concat([zoomInItem, zoomOutItem]);
       const goItems = ['First Page', 'Previous Page', 'Next Page'].map((label, i) => new MenuItem({
         label,
@@ -160,7 +161,7 @@ export class ReaderComponent implements OnChanges {
           })
         }
       }));
-      append(vm, viewItems, scaleItems, goItems);
+      append(vm, viewItems, modeItems, goItems);
       this.m.set();
       const setZoomItemEnabled = (min: number, max: number) => {
         const unit = this.config.ui.view.zoomUnit;
@@ -193,16 +194,16 @@ export class ReaderComponent implements OnChanges {
           {label: 'Single'},
         ],
         selectedIndex: barViewMap.getA(this.config.view.get()),
-        change: i => setView(i)
+        change: setView
       });
-      const scaleCtrl = new TouchBarSegmentedControl({
+      const modeCtrl = new TouchBarSegmentedControl({
         segments: [
           {label: 'Page'},
           {label: 'Default'},
           {label: 'Width'},
         ],
-        selectedIndex: barScaleMap.getA(this.config.scale.get()),
-        change: i => setScale(i)
+        selectedIndex: barModeMap.getA(this.config.mode.get()),
+        change: setMode
       });
       this.book.onPage((current) => {
         lock.run(() => {
@@ -220,7 +221,7 @@ export class ReaderComponent implements OnChanges {
         //   mode: 'free',
         //   selectedStyle: 'outline',
         // }),
-        scaleCtrl,
+        modeCtrl,
         // new TouchBarButton({label: 'ZoomOut', click: () => this.zoom(-10)}),
       ]);
 
@@ -237,9 +238,9 @@ export class ReaderComponent implements OnChanges {
           }, 0);
         }
       });
-      this.config.scale.change(n => {
-        const index = Config.SCALE_ALL.indexOf(n);
-        scaleItems.filter((item, i) => i === index).forEach(item => item.checked = true);
+      this.config.mode.change(n => {
+        const index = Config.MODE_ALL.indexOf(n);
+        modeItems.filter((item, i) => i === index).forEach(item => item.checked = true);
       });
     }
   }
