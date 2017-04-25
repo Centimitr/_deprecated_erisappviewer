@@ -62,10 +62,6 @@ export class ReaderComponent implements OnChanges {
       });
       this.config.clear();
       setTimeout(() => this.config.setScaleConstraint(this.book, this.viewers), 0);
-      // temp limit
-      // if (this.config.scale.get() < this.config.scale.max) {
-      //   this.config.scale.set(this.config.scale);
-      // }
 
       // turn to specific page
       if (this.book.meta.LastRead) {
@@ -81,10 +77,9 @@ export class ReaderComponent implements OnChanges {
           this.book.go(page);
         }
       }
-
       // scale and view
-      const barModeMap = new ABMap(Config.MODE_ALL);
       const barViewMap = new ABMap(Config.VIEW_ALL);
+      const barModeMap = new ABMap(Config.MODE_ALL);
       const setView = i => {
         this.zone.run(() => {
           this.config.view.set(barViewMap.getB(i));
@@ -97,7 +92,6 @@ export class ReaderComponent implements OnChanges {
       };
       //pinch
       this.config.pinch.change(v => {
-        // this.config.scale.set();
         if (this.config.mode.is(Config.MODE_DEFAULT)) {
           const to = this.config.scale.get() * ((v - 1) * 0.5 + 1);
           this.config.scale.set(to);
@@ -122,26 +116,27 @@ export class ReaderComponent implements OnChanges {
         label,
         accelerator: `CmdOrCtrl+${i + 1}`,
         type: 'radio',
-        click: setView,
+        click: () => setView(i),
         checked: barViewMap.getA(this.config.view.get()) === i,
       }));
-      const zoomInItem = new MenuItem({
-        label: '! Zoom In',
-        accelerator: 'CmdOrCtrl+Plus',
-        click: () => this.zoom(this.config.ui.view.zoomUnit)
-      });
-      const zoomOutItem = new MenuItem({
-        label: '! Zoom Out',
-        accelerator: 'CmdOrCtrl+-',
-        click: () => this.zoom(-1 * this.config.ui.view.zoomUnit)
-      });
+      // const zoomInItem = new MenuItem({
+      //   label: 'Zoom In',
+      //   accelerator: 'CmdOrCtrl+Plus',
+      //   click: () => this.zone.run(() => this.config.scale.set(this.config.scale.get() + this.config.ui.view.zoomUnit))
+      // });
+      // const zoomOutItem = new MenuItem({
+      //   label: 'Zoom Out',
+      //   accelerator: 'CmdOrCtrl+-',
+      //   click: () => this.zone.run(() => this.config.scale.set(this.config.scale.get() - this.config.ui.view.zoomUnit))
+      // });
       const modeItems = ['Full Page', 'Default', 'Width FullFilled'].map((label, i) => new MenuItem({
         label,
         accelerator: `CmdOrCtrl+Alt+${i + 1}`,
         type: 'radio',
-        click: setMode,
+        click: () => setMode(i),
         checked: barModeMap.getA(this.config.mode.get()) === i
-      })).concat([zoomInItem, zoomOutItem]);
+      }));
+      // .concat([zoomInItem, zoomOutItem]);
       const goItems = ['First Page', 'Previous Page', 'Next Page'].map((label, i) => new MenuItem({
         label,
         accelerator: [null, 'Left', 'Right'][i],
@@ -163,16 +158,16 @@ export class ReaderComponent implements OnChanges {
       }));
       append(vm, viewItems, modeItems, goItems);
       this.m.set();
-      const setZoomItemEnabled = (min: number, max: number) => {
-        const unit = this.config.ui.view.zoomUnit;
-        const cur = this.config.scale.get();
-        const toMin = (100 - unit) / 100 * cur;
-        const toMax = (100 + unit) / 100 * cur;
-        const threshold = 5;
-        [zoomOutItem.enabled, zoomInItem.enabled] = [toMin - min <= threshold, max - toMax <= threshold];
-      };
-      this.config.scale.change(() => setZoomItemEnabled(this.config.scale.min, this.config.scale.max));
-      this.config.onSetScaleConstraint((min, max) => setZoomItemEnabled(min, max));
+      // const setZoomItemEnabled = (min: number, max: number) => {
+      //   const unit = this.config.ui.view.zoomUnit;
+      //   const cur = this.config.scale.get();
+      //   const toMin = (100 - unit) / 100 * cur;
+      //   const toMax = (100 + unit) / 100 * cur;
+      //   const threshold = 5;
+      //   // [zoomOutItem.enabled, zoomInItem.enabled] = [toMin - min <= threshold, max - toMax <= threshold];
+      // };
+      // this.config.scale.change(() => setZoomItemEnabled(this.config.scale.min, this.config.scale.max));
+      // this.config.onSetScaleConstraint((min, max) => setZoomItemEnabled(min, max));
 
       // touchBar
       const getProgressStr = (current: number = this.book.current) => current + '/' + this.book.total;
@@ -245,16 +240,7 @@ export class ReaderComponent implements OnChanges {
     }
   }
 
-  zoom(percent: number) {
-    setTimeout(() => {
-      this.config.scale.set(this.config.scale.get() * (100 + percent) / 100);
-    }, 0)
-  }
-
-  // @HostListener('window:keydown.arrowUp', ['$event'])
-  // @HostListener('window:keydown.arrowLeft', ['$event'])
-  @HostListener('window:keydown.pageUp', ['$event'])
-  prev() {
+  @HostListener('window:keydown.pageUp', ['$event']) prev() {
     if (this.book) {
       this.zone.run(() => {
         this.book.prev();
@@ -262,10 +248,7 @@ export class ReaderComponent implements OnChanges {
     }
   };
 
-  // @HostListener('window:keydown.arrowDown', ['$event'])
-  // @HostListener('window:keydown.arrowRight', ['$event'])
-  @HostListener('window:keydown.pageDown', ['$event'])
-  next() {
+  @HostListener('window:keydown.pageDown', ['$event']) next() {
     if (this.book) {
       this.zone.run(() => {
         this.book.next();
@@ -303,11 +286,7 @@ export class ReaderComponent implements OnChanges {
   @HostListener('window:mousewheel', ['$event'])
   async onWheel(e) {
     e.preventDefault();
-    if (e.ctrlKey) {
-      this.config.pinch.set(Math.exp(-e.deltaY / 100));
-    } else {
-      const direction = this.config.natureScroll ? 1 : -1;
-      this.elm.firstElementChild.scrollTop += e.deltaY * direction;
-    }
+    if (e.ctrlKey) this.config.pinch.set(Math.exp(-e.deltaY / 100));
+    else this.elm.firstElementChild.scrollTop += e.deltaY * (this.config.natureScroll ? 1 : -1);
   }
 }

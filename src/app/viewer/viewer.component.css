@@ -51,26 +51,6 @@ section.singlePage.overflow {
 
 img {
   box-shadow: 0 0 32px 4px rgba(0, 0, 0, 0.4);
-  /*transition: opacity 750ms ease-in-out;*/
-  /*opacity: 0.6;*/
-  /*animation: loaded 500ms;*/
-}
-
-/*@keyframes loaded {*/
-/*from {*/
-/*opacity: 0.8;*/
-/*filter: blur(2px);*/
-/*}*/
-/*to {*/
-/*filter: blur(0);*/
-/*opacity: 1;*/
-/*}*/
-/*}*/
-
-img.visible {
-  /*opacity: 1;*/
-}
-
-.viewer, img {
-  transition: 50ms ease-in-out;
+  opacity: 1;
+  transition: 15ms ease;
 }

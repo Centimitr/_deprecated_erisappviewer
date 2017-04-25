@@ -11,28 +11,24 @@ import {Config} from "../reader/config";
   templateUrl: './viewer.component.html',
   styleUrls: ['./viewer.component.css']
 })
-export class ViewerComponent implements OnInit, OnChanges {
+export class ViewerComponent implements OnInit {
   @Input() path: string;
   @Input() meta: PageMeta;
   @Input() page: number;
-  height: number;
   @Input() cache: boolean;
   @Input() config: Config;
+  height: number;
   show: boolean = false;
   elm: any;
   inView: boolean = false;
-  overflow: Promise<boolean>;
-  o: boolean = false;
   @Output() enter = new EventEmitter<null>();
   @Output() leave = new EventEmitter<null>();
   @Output() attention = new EventEmitter<null>();
-  c = new Change<string>();
   private img: HTMLImageElement;
 
   constructor(elm: ElementRef, private zone: NgZone) {
     this.elm = elm.nativeElement;
     this.elm.addEventListener('ready', e => console.log(e));
-    this.overflow = new Promise<boolean>(r => 0);
   }
 
   scrollTo() {
@@ -96,9 +92,6 @@ export class ViewerComponent implements OnInit, OnChanges {
       const scale = Math.min(1, w / p.Width, h / p.Height);
       this.height = p.Height * scale;
     }
-  }
-
-  ngOnChanges(changes) {
   }
 
   isOverflow() {

@@ -99,14 +99,14 @@ export class Config {
       before: 50,
       after: 50,
       intervalCorrection: 50,
-      zoomUnit: 10
+      zoomUnit: 5
     }
   };
 
   clear() {
     this.pinch.clear();
     this.mode.clear();
-    // this.mode.clear();
+    this.mode.clear();
     this.view.clear();
   }
 
@@ -161,18 +161,6 @@ export class Config {
     return this.mode.is(Config.MODE_FULL_HEIGHT);
   }
 
-  whenFullHeight(v: any): boolean {
-    if (this.isFullHeight()) {
-      return v;
-    }
-  }
-
-  whenNotFullHeight(v: any): boolean {
-    if (!this.isFullHeight()) {
-      return v;
-    }
-  }
-
   // view
   view = new ConfigItem<number>(Config.VIEW_SINGLE_PAGE);
   static VIEW_CONTINUOUS_SCROLL: number = 0;
@@ -191,12 +179,6 @@ export class Config {
 
   isSinglePage(): boolean {
     return this.view.get() === Config.VIEW_SINGLE_PAGE;
-  }
-
-  whenSinglePage(v: any) {
-    if (this.isSinglePage()) {
-      return v;
-    }
   }
 
   // mixed
