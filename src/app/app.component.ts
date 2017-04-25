@@ -1,4 +1,4 @@
-import {Component, NgZone, OnInit} from '@angular/core';
+import {Component, HostListener, NgZone, OnInit} from '@angular/core';
 import args from "./lib/args";
 import {AppMenu, MenuItem} from "./lib/menu";
 import {AppStorage, AppStorageValue, KeyValue} from "./lib/storage";
@@ -6,6 +6,7 @@ import {Title} from "@angular/platform-browser";
 const electron = window['require']('electron');
 const {webFrame} = electron;
 const {dialog, getCurrentWindow} = electron.remote;
+const ses = getCurrentWindow().webContents.session;
 
 @Component({
   selector: 'app-root',
@@ -19,12 +20,16 @@ export class AppComponent implements OnInit {
   constructor(private zone: NgZone, private title: Title, private m: AppMenu, private s: AppStorage) {
     webFrame.setVisualZoomLevelLimits(1, 1);
     webFrame.setLayoutZoomLevelLimits(1, 1);
+
+    ses.on('will-download', (event, item, webContents) => {
+      event.preventDefault();
+    });
+
     this.m.reset();
     const re = this.s.get('menu.recentlyEnjoyed');
     re.onChange(() => this.setFileMenu(re));
     this.setFileMenu(re);
   }
-
 
   setFileMenu(re: AppStorageValue) {
     // file menu
@@ -67,7 +72,6 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const ses = getCurrentWindow().webContents.session;
     const getSize = () => new Promise<number>(resolve => ses.getCacheSize(size => resolve(size)));
     // setInterval(async () => {
     //   const s = await getSize();
@@ -99,11 +103,22 @@ export class AppComponent implements OnInit {
     return this.title.getTitle();
   }
 
+  onContextMenu() {
+  }
+
   zoom() {
     const win = getCurrentWindow();
     return win.isMaximized() ? win.unmaximize() : win.maximize();
   }
 
-  onContextMenu() {
+  @HostListener('window:dragover', ['$event'])
+  @HostListener('window:dragleave', ['$event'])
+  @HostListener('window:dragend', ['$event']) onDropBefore() {
+    return false;
+  }
+
+  @HostListener('window:drop', ['$event']) onDrop(e) {
+    e.preventDefault();
+    this.path = e.dataTransfer.files[0].path;
   }
 }

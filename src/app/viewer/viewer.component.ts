@@ -82,8 +82,9 @@ export class ViewerComponent implements OnInit {
 
   setHeight() {
     const pages: HTMLElement = this.elm.parentElement;
+    if (!pages) return;
     const p = this.meta;
-    if (this.config.mode.is(Config.MODE_FULL_HEIGHT)) {
+    if (this.config.view.is(Config.VIEW_SINGLE_PAGE) && this.config.mode.is(Config.MODE_FULL_HEIGHT)) {
       this.height = pages.offsetHeight;
     } else {
       const xScale = 100;
