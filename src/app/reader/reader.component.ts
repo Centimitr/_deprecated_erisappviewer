@@ -16,7 +16,6 @@ import {CheckInterface, Config} from "./config";
 import {AppMenu} from "../lib/menu";
 import {Title} from "@angular/platform-browser";
 import {AppStorage} from "app/lib/storage";
-import {RenderService} from "../render.service";
 const fs = window['require']('fs');
 const {dialog, getCurrentWindow, Menu, MenuItem} = window['require']('electron').remote;
 
@@ -34,6 +33,7 @@ export class ReaderComponent implements OnChanges {
   @Output() ok = new EventEmitter<null>();
   @Output() fail = new EventEmitter<any>();
   elm: HTMLElement;
+  private pageList = [];
 
   @ViewChildren(ViewerComponent) viewers: QueryList<ViewerComponent>;
 
@@ -45,6 +45,16 @@ export class ReaderComponent implements OnChanges {
   constructor(private zone: NgZone, private title: Title, private m: AppMenu, private s: AppStorage, elm: ElementRef) {
     this.elm = elm.nativeElement;
     this.config = new Config();
+  }
+
+  update(page: number, leave?: boolean) {
+    if (leave) {
+      this.pageList = this.pageList.filter(p => p !== page);
+    }
+    else {
+      this.pageList.push(page);
+    }
+    this.book.updateCurrent(this.pageList[this.pageList.length - 1]);
   }
 
   async ngOnChanges(changes) {

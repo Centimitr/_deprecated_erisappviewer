@@ -10,7 +10,8 @@
           [cache]="inCacheRange(i+1)"
           [path]="book.getPageFilePath(p.Id)"
           [meta]="p"
-          (attention)="book.updateCurrent(i+1)">
+          (attention)="update(i+1)"
+          (leave)="update(i+1, true)">
   </viewer>
 </section>
 <section class="layer">
