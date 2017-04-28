@@ -1,6 +1,6 @@
 import {Component, HostListener, NgZone, OnInit} from '@angular/core';
 import args from "./lib/args";
-import {AppMenu, MenuItem} from "./lib/menu";
+import {AppMenu, Menu, MenuItem, alwaysOnTopItem} from "./lib/menu";
 import {AppStorage, AppStorageValue, KeyValue} from "./lib/storage";
 import {Title} from "@angular/platform-browser";
 const electron = window['require']('electron');
@@ -16,10 +16,19 @@ const ses = getCurrentWindow().webContents.session;
 export class AppComponent implements OnInit {
   path: string;
   refresh: number = 0;
+  win: any;
+  titleBarContextMenu: any;
 
   constructor(private zone: NgZone, private title: Title, private m: AppMenu, private s: AppStorage) {
+    this.win = getCurrentWindow();
+    const menu = new Menu();
+    const aotItem = new MenuItem(alwaysOnTopItem);
+    menu.append(aotItem);
+    menu.refreshAOTChecked = () => aotItem.checked = this.win.isAlwaysOnTop();
+    this.titleBarContextMenu = menu;
+
     webFrame.setVisualZoomLevelLimits(1, 1);
-    webFrame.setLayoutZoomLevelLimits(1, 1);
+    webFrame.setLayoutZoomLevelLimits(0, 0);
 
     ses.on('will-download', (event, item, webContents) => {
       event.preventDefault();
@@ -94,8 +103,11 @@ export class AppComponent implements OnInit {
   }
 
   async open() {
-    this.path = dialog.showOpenDialog({properties: ['openFile', 'openDirectory']}).pop();
-    await this.whenOpen();
+    try {
+      this.path = dialog.showOpenDialog({properties: ['openFile', 'openDirectory']}).pop();
+      await this.whenOpen();
+    } catch (e) {
+    }
     // this.refresh++;
   }
 
@@ -103,12 +115,15 @@ export class AppComponent implements OnInit {
     return this.title.getTitle();
   }
 
-  onContextMenu() {
+  onContextMenu(e, titleBar) {
+    const m = this.titleBarContextMenu;
+    m.refreshAOTChecked();
+    m.popup(this.win, {x: e.x, y: titleBar.offsetHeight / 2});
   }
 
   zoom() {
-    const win = getCurrentWindow();
-    return win.isMaximized() ? win.unmaximize() : win.maximize();
+    const w = this.win;
+    return w.isMaximized() ? w.unmaximize() : w.maximize();
   }
 
   @HostListener('window:dragover', ['$event'])

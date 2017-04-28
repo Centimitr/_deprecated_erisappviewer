@@ -72,7 +72,7 @@ export class ConfigRangedItem extends ConfigItem<number> {
   }
 
   setRange(min, max) {
-    if (min >= max) console.error('min should be smaller than max');
+    if (min >= max) console.error('min should be smaller than max:', min, max);
     [this.min, this.max] = [min, max];
     if (this.value < this.min) this.set(this.min);
     else if (this.value > this.max) this.set(this.max);
@@ -135,7 +135,7 @@ export class Config {
       const imgMinW = book.meta.Pages.map(pm => pm.Width).reduce((a, b) => a < b ? a : b);
       const imgMinH = book.meta.Pages.map(pm => pm.Height).reduce((a, b) => a < b ? a : b);
       const MIN_HEIGHT_PROPORTION = 65;
-      const MIN_WIDTH_PROPORTION = 35;
+      const MIN_WIDTH_PROPORTION = 30;
       this.scale.setRange(Math.max(MIN_HEIGHT_PROPORTION * vh / imgMinH, MIN_WIDTH_PROPORTION * vw / imgMinW), 100 * vw / imgMinW);
       this._onSetScaleConstraint.forEach(cb => cb(this.scale.min, this.scale.max));
     }

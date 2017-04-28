@@ -33,6 +33,11 @@ section.singlePage.overflow {
   opacity: 0.8;
 }
 
+.loading.hide {
+  opacity: 0;
+  transition: opacity 275ms ease-in;
+}
+
 .loading .words {
   display: flex;
   flex-flow: column nowrap;

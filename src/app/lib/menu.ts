@@ -3,10 +3,15 @@ const electron = window['require']('electron');
 const {app, Menu, MenuItem} = electron.remote;
 const process = window['process'];
 
-export {
-  MenuItem
-}
-
+const alwaysOnTopItem = {
+  label: 'Always on Top',
+  type: 'checkbox',
+  checked: false,
+  click(item, win) {
+    win.setAlwaysOnTop(!win.isAlwaysOnTop());
+    item.checked = win.isAlwaysOnTop();
+  }
+};
 const getTemplate = function () {
   const template: any = [
     {
@@ -98,15 +103,7 @@ const getTemplate = function () {
         click(item, win){
           win.center();
         }
-      }, {
-        label: 'Always on Top',
-        type: 'checkbox',
-        checked: false,
-        click(item, win) {
-          win.setAlwaysOnTop(!win.isAlwaysOnTop());
-          item.checked = win.isAlwaysOnTop();
-        }
-      }, {
+      }, alwaysOnTopItem, {
         type: 'separator'
       }, {
         label: 'Bring All to Front',
@@ -123,6 +120,12 @@ const getTemplate = function () {
   }
   return Menu.buildFromTemplate(template);
 };
+
+export {
+  Menu,
+  MenuItem,
+  alwaysOnTopItem
+}
 
 @Injectable()
 export class AppMenu {

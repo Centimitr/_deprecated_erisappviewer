@@ -87,11 +87,7 @@ export class ViewerComponent implements OnInit {
     if (this.config.view.is(Config.VIEW_SINGLE_PAGE) && this.config.mode.is(Config.MODE_FULL_HEIGHT)) {
       this.height = pages.offsetHeight;
     } else {
-      const xScale = 100;
-      const yScale = this.config.scale.get();
-      const [w, h] = [xScale / 100 * pages.offsetWidth, yScale / 100 * pages.offsetHeight];
-      const scale = Math.min(1, w / p.Width, h / p.Height);
-      this.height = p.Height * scale;
+      this.height = p.Height * this.config.scale.get() / 100;
     }
   }
 

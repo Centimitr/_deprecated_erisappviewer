@@ -17,7 +17,7 @@ import {AppMenu} from "../lib/menu";
 import {Title} from "@angular/platform-browser";
 import {AppStorage} from "app/lib/storage";
 const fs = window['require']('fs');
-const {dialog, getCurrentWindow, Menu, MenuItem} = window['require']('electron').remote;
+const {dialog, BrowserWindow, getCurrentWindow, Menu, MenuItem} = window['require']('electron').remote;
 
 @Component({
   selector: 'reader',
@@ -147,9 +147,9 @@ export class ReaderComponent implements OnChanges {
         checked: barModeMap.getA(this.config.mode.get()) === i
       }));
       // .concat([zoomInItem, zoomOutItem]);
-      const goItems = ['First Page', 'Previous Page', 'Next Page'].map((label, i) => new MenuItem({
+      const goItems = ['First Page', 'Go to..', 'Previous Page', 'Next Page'].map((label, i) => new MenuItem({
         label,
-        accelerator: [null, 'Left', 'Right'][i],
+        accelerator: [null, 'CmdOrCtrl+G', 'Left', 'Right'][i],
         click: () => {
           this.zone.run(() => {
             switch (i) {
@@ -157,9 +157,15 @@ export class ReaderComponent implements OnChanges {
                 this.book.go(1);
                 break;
               case 1:
-                this.book.prev();
+                const w = new BrowserWindow({
+                  modal: true, parent: getCurrentWindow()
+                });
+                w.show();
                 break;
               case 2:
+                this.book.prev();
+                break;
+              case 3:
                 this.book.next();
                 break;
             }
@@ -230,6 +236,7 @@ export class ReaderComponent implements OnChanges {
         // new TouchBarButton({label: 'ZoomOut', click: () => this.zoom(-10)}),
       ]);
 
+      // update menu and touchBar
       this.config.view.change(n => {
         const index = Config.VIEW_ALL.indexOf(n);
         viewItems.filter((item, i) => i === index).forEach(item => item.checked = true);
@@ -246,6 +253,7 @@ export class ReaderComponent implements OnChanges {
       this.config.mode.change(n => {
         const index = Config.MODE_ALL.indexOf(n);
         modeItems.filter((item, i) => i === index).forEach(item => item.checked = true);
+        modeCtrl.selectedIndex = index;
       });
     }
   }
