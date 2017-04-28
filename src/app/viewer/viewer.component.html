@@ -17,6 +17,7 @@
        [style.maxHeight.px]="config.whenNotFullWidth(height)"
        [style.minWidth.%]="config.whenFullWidth(100)"
        [style.width.%]="config.whenFullWidth(100)"
+       [style.maxWidth.%]="100"
        [hidden]="!show"
        (load)="onLoad(img)">
   <!--[class.visible]="show && config.isContinuousScroll()?inView:true"-->
