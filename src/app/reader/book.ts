@@ -81,10 +81,10 @@ export class Book {
     return this.go((page || 0) + 1, !page);
   }
 
-  getPageFilePath(id: string) {
+  getPageFilePath(imgLocator: string) {
     const url = new URL(`http://localhost:${args.port}/book/page`);
     url['searchParams'].append('locator', this.locator);
-    url['searchParams'].append('page', id);
+    url['searchParams'].append('page', imgLocator);
     return url.href;
   }
 
@@ -93,6 +93,6 @@ export class Book {
   }
 
   getLastReadIndex() {
-    return this.meta.Pages.map(pm => pm.Id).indexOf(this.meta.LastRead);
+    return this.meta.Pages.map(pm => pm.Locator).indexOf(this.meta.LastRead);
   }
 }

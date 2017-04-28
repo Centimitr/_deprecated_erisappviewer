@@ -8,7 +8,7 @@
           [class]="i"
           [page]="i+1"
           [cache]="inCacheRange(i+1)"
-          [path]="book.getPageFilePath(p.Id)"
+          [path]="book.getPageFilePath(p.Locator)"
           [meta]="p"
           (attention)="update(i+1)"
           (leave)="update(i+1, true)">

@@ -1,5 +1,5 @@
 export class PageMeta {
-  Id: string;
+  Locator: string;
   Name: string;
   Width: number;
   Height: number;
@@ -7,7 +7,6 @@ export class PageMeta {
 }
 
 export class BookMeta {
-  Id: string;
   Locator: string;
   Name: string;
   Author: string;
