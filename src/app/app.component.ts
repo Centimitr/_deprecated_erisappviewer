@@ -102,9 +102,19 @@ export class AppComponent implements OnInit {
     getCurrentWindow().show();
   }
 
-  async open() {
+  async open(e?:any) {
+    if(e){
+      alert(e);
+    }
     try {
-      this.path = dialog.showOpenDialog({properties: ['openFile', 'openDirectory']}).pop();
+      this.path = dialog.showOpenDialog({
+        properties: ['openFile', 'openDirectory', 'showHiddenFiles'],
+        filters: [
+          {name: 'Images', extensions: ['webp', 'jpg', 'png', 'gif', 'jpeg']},
+          {name: 'Manga', extensions: ['eris']},
+          {name: 'Archive', extensions: ['rar', 'zip']},
+        ]
+      }).pop();
       await this.whenOpen();
     } catch (e) {
     }

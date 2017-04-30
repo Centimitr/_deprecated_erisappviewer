@@ -1,6 +1,6 @@
 import {ViewerComponent} from "../viewer/viewer.component";
 import {Book} from "app/reader/book";
-import {QueryList} from "@angular/core";
+import {Query, QueryList} from "@angular/core";
 let cnt = 0;
 const pt = v => console.log(cnt++, v);
 export interface CheckInterface {
@@ -128,15 +128,16 @@ export class Config {
     this._onSetScaleConstraint.push(cb);
   }
 
-  setScaleConstraint(book: Book, viewers: QueryList<ViewerComponent>) {
+  setScaleConstraint(book: Book, reader: HTMLElement, viewers: QueryList<ViewerComponent>) {
     if (book.meta.Pages.length && viewers.length) {
-      const vw = viewers.map(v => v.elm.offsetWidth).reduce((a, b) => a > b ? a : b);
-      const vh = viewers.map(v => v.elm.offsetHeight).reduce((a, b) => a > b ? a : b);
-      const imgMinW = book.meta.Pages.map(pm => pm.Width).reduce((a, b) => a < b ? a : b);
-      const imgMinH = book.meta.Pages.map(pm => pm.Height).reduce((a, b) => a < b ? a : b);
-      const MIN_HEIGHT_PROPORTION = 65;
-      const MIN_WIDTH_PROPORTION = 30;
-      this.scale.setRange(Math.max(MIN_HEIGHT_PROPORTION * vh / imgMinH, MIN_WIDTH_PROPORTION * vw / imgMinW), 100 * vw / imgMinW);
+      // const vw = Math.max(...viewers.map(v => v.elm.offsetWidth));
+      // const vh = Math.max(...viewers.map(v => v.elm.offsetHeight));
+      const imgWs = viewers.map(v => v.oriWidth).filter(v => v);
+      const imgHs = viewers.map(v => v.oriHeight).filter(v => v);
+      if (!imgWs.length || !imgHs.length) return;
+      // const MIN_HEIGHT_PROPORTION = 65;
+      // const MIN_WIDTH_PROPORTION = 30;
+      this.scale.setRange(100 * 375 / reader.offsetHeight, 100 * reader.offsetWidth / Math.min(...imgWs));
       this._onSetScaleConstraint.forEach(cb => cb(this.scale.min, this.scale.max));
     }
   }

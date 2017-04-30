@@ -13,17 +13,19 @@ import {Config} from "../reader/config";
 })
 export class ViewerComponent implements OnInit {
   @Input() path: string;
-  @Input() meta: PageMeta;
   @Input() page: number;
   @Input() cache: boolean;
   @Input() config: Config;
   height: number;
+  oriHeight: number;
+  oriWidth: number;
   show: boolean = false;
   elm: any;
   inView: boolean = false;
   @Output() enter = new EventEmitter<null>();
   @Output() leave = new EventEmitter<null>();
   @Output() attention = new EventEmitter<null>();
+  @Output() load = new EventEmitter<null>();
   private img: HTMLImageElement;
 
   constructor(elm: ElementRef, private zone: NgZone) {
@@ -41,6 +43,10 @@ export class ViewerComponent implements OnInit {
   onLoad(img: HTMLImageElement) {
     this.show = true;
     this.img = img;
+    this.oriHeight = img.naturalHeight;
+    this.oriWidth = img.naturalWidth;
+    this.setHeight();
+    this.load.emit();
   }
 
   async ngOnInit() {
@@ -77,18 +83,17 @@ export class ViewerComponent implements OnInit {
   }
 
   @HostListener('window:resize', ['$event']) onResize() {
-    this.setHeight();
+    setTimeout(()=>{
+      this.setHeight();
+    });
   }
 
   setHeight() {
+    if (!this.oriHeight) return;
     const pages: HTMLElement = this.elm.parentElement;
     if (!pages) return;
-    const p = this.meta;
-    if (this.config.view.is(Config.VIEW_SINGLE_PAGE) && this.config.mode.is(Config.MODE_FULL_HEIGHT)) {
-      this.height = pages.offsetHeight;
-    } else {
-      this.height = p.Height * this.config.scale.get() / 100;
-    }
+    if (this.config.mode.is(Config.MODE_FULL_HEIGHT)) this.height = pages.offsetHeight;
+    else this.height = this.oriHeight * this.config.scale.get() / 100;
   }
 
   isOverflow() {
@@ -96,6 +101,10 @@ export class ViewerComponent implements OnInit {
     else if (this.config.mode.is(Config.MODE_FULL_HEIGHT)) return false;
     else if (!this.img) return false;
     else return this.img.height > this.elm.parentElement.offsetHeight;
+  }
+
+  getContainerHeight() {
+    return this.config.whenContinuousScroll(this.oriHeight ? null : 375);
   }
 
   getPos() {

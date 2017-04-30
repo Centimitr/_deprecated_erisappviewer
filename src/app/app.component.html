@@ -1,4 +1,4 @@
-<reader [path]="path" [refresh]="refresh" (ok)="onOk()" (fail)="open()"></reader>
+<reader [path]="path" [refresh]="refresh" (ok)="onOk()" (fail)="open($event)"></reader>
 <header class="titlebar" (dblclick)="zoom()" (contextmenu)="onContextMenu($event, titleBar)" #titleBar>{{getTitle()}}</header>
 <!--<section class="cover" *ngIf="cover.show" #c>-->
   <!--<img-->

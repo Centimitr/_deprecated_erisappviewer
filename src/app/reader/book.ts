@@ -35,7 +35,7 @@ export class Book {
     url['searchParams'].append('locator', this.locator);
     const data = await fetch(url.href);
     this.meta = await data.json();
-    if (!this.meta.Pages) {
+    if (!this.meta.Pages || !this.meta.Pages.length) {
       return 'no pages';
     }
     this.total = this.meta.Pages.length;

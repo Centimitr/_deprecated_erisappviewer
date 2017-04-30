@@ -1,6 +1,6 @@
 import {
   Component, OnInit, Input, HostListener, NgZone, OnChanges, ViewChildren, QueryList,
-  Output, EventEmitter, ElementRef
+  Output, EventEmitter, ElementRef, ContentChild
 } from '@angular/core';
 import {
   setTouchBar,
@@ -65,28 +65,30 @@ export class ReaderComponent implements OnChanges {
         this.fail.emit(e);
         return;
       }
+      this.book.meta.Pages.forEach((p, i) => p['i'] = i);
       this.ok.emit();
       this.title.setTitle(this.book.meta.Name);
       this.viewers.changes.subscribe(() => {
         this.book.bind(this.viewers.map(v => v));
       });
       this.config.clear();
-      setTimeout(() => this.config.setScaleConstraint(this.book, this.viewers), 0);
 
       // turn to specific page
-      if (this.book.meta.LastRead) {
-        const page = this.book.getLastReadIndex();
-        const shouldTurn = dialog.showMessageBox(getCurrentWindow(), {
-            type: 'question',
-            message: `Turn to Page${page}`,
-            detail: `You may opened the book via Page${page}, 'OK' to turn that page rather than Page1.`,
-            buttons: ['Yes', 'Cancel'],
-            cancelId: 1
-          }) === 0;
-        if (shouldTurn) {
-          this.book.go(page);
+      setTimeout(() => {
+        if (this.book.meta.LastRead) {
+          const page = this.book.getLastReadIndex();
+          const shouldTurn = dialog.showMessageBox(getCurrentWindow(), {
+              type: 'question',
+              message: `Turn to Page${page}`,
+              detail: `The book is opened via page${page}, 'OK' to go that page rather than Page1.`,
+              buttons: ['Yes', 'Cancel'],
+              cancelId: 1
+            }) === 0;
+          if (shouldTurn) {
+            this.book.go(page);
+          }
         }
-      }
+      });
       // scale and view
       const barViewMap = new ABMap(Config.VIEW_ALL);
       const barModeMap = new ABMap(Config.MODE_ALL);
@@ -103,7 +105,7 @@ export class ReaderComponent implements OnChanges {
       //pinch
       this.config.pinch.change(v => {
         if (this.config.mode.is(Config.MODE_DEFAULT)) {
-          const to = this.config.scale.get() * ((v - 1) * 0.5 + 1);
+          const to = this.config.scale.get() * ((v - 1) * 0.8 + 1);
           this.config.scale.set(to);
         }
       });
@@ -274,9 +276,15 @@ export class ReaderComponent implements OnChanges {
     }
   };
 
+  setScaleConstraint() {
+    this.config.setScaleConstraint(this.book, this.elm, this.viewers);
+  }
+
   @HostListener('window:resize', ['$event']) onResize() {
     console.warn('RESIZED!');
-    this.config.setScaleConstraint(this.book, this.viewers);
+    setTimeout(() => {
+      this.setScaleConstraint();
+    }, 0);
   }
 
   inCacheRange(page: number): boolean {
