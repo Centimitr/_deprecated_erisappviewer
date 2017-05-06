@@ -1,7 +1,6 @@
 import {BookMeta} from "./meta";
 import args from "../lib/args";
-import {Config} from "./config";
-import {ViewerComponent} from "../viewer/viewer.component";
+import {Config} from "../config.service";
 
 export class Book {
   locator: string;
@@ -9,15 +8,11 @@ export class Book {
   _current: number;
   total: number;
   _onPage: Function[] = [];
-  _viewers: ViewerComponent[];
 
   constructor(path: string, private config: Config) {
     this.locator = path;
   }
 
-  bind(viewers: ViewerComponent[]) {
-    this._viewers = viewers;
-  }
 
   get current(): number {
     return this._current;
@@ -31,7 +26,7 @@ export class Book {
 
   async init(): Promise<any> {
     await args.wait();
-    const url = new URL(`http://localhost:${args.port}/book`);
+    const url = new URL(`https://localhost:${args.port}/book`);
     url['searchParams'].append('locator', this.locator);
     const data = await fetch(url.href);
     this.meta = await data.json();
@@ -60,14 +55,8 @@ export class Book {
     const page = relative ? this.current + pageOrOffset : pageOrOffset;
     const ok = this.checkPage(page);
     if (ok) {
-      const viewer = this._viewers[page - 1];
       if (this.config.isSinglePage()) {
         this.current = page;
-        setTimeout(() => {
-          viewer.scrollTo();
-        }, 0);
-      } else {
-        viewer.scrollTo();
       }
     }
     return ok;
@@ -82,7 +71,7 @@ export class Book {
   }
 
   getPageFilePath(imgLocator: string) {
-    const url = new URL(`http://localhost:${args.port}/book/page`);
+    const url = new URL(`https://localhost:${args.port}/book/page`);
     url['searchParams'].append('locator', this.locator);
     url['searchParams'].append('page', imgLocator);
     return url.href;
@@ -90,6 +79,10 @@ export class Book {
 
   onPage(callback: (n?: number, old?: number) => void) {
     this._onPage.push(callback);
+  }
+
+  onPageRemove(callback: (n?: number, old?: number) => void) {
+    this._onPage = this._onPage.filter(cb => cb !== callback);
   }
 
   getLastReadIndex() {

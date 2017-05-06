@@ -1,21 +1,21 @@
 <section class="pages" #pages>
-  <viewer #page *ngFor="let p of book?.meta?.Pages; let i = index;"
-          [style.marginTop.px]="config.whenContinuousScroll(config.ui.view.before-(i!==0?config.ui.view.intervalCorrection:0))"
-          [style.marginBottom.px]="config.whenContinuousScroll(config.ui.view.after)"
-          [config]="config"
-          [hidden]="config.isContinuousScroll()? false: (i+1!==book.current)"
-          [id]="'page-'+(i+1)"
-          [class]="i"
-          [page]="i+1"
-          [cache]="inCacheRange(i+1)"
-          [path]="book.getPageFilePath(p.Locator)"
-          [meta]="p"
-          (attention)="update(i+1)"
-          (leave)="update(i+1, true)">
-  </viewer>
+  <!--<viewer #page *ngFor="let p of book?.meta?.Pages; let i = index;"-->
+  <!--[style.marginTop.px]="config.whenContinuousScroll(config.ui.view.before-(i!==0?config.ui.view.intervalCorrection:0))"-->
+  <!--[style.marginBottom.px]="config.whenContinuousScroll(config.ui.view.after)"-->
+  <!--[config]="config"-->
+  <!--[hidden]="config.isContinuousScroll()? false: (i+1!==book.current)"-->
+  <!--[id]="'page-'+(i+1)"-->
+  <!--[class]="i"-->
+  <!--[page]="i+1"-->
+  <!--[cache]="inCacheRange(i+1)"-->
+  <!--[path]="book.getPageFilePath(p.Locator)"-->
+  <!--(attention)="update(i+1)"-->
+  <!--(leave)="update(i+1, true)">-->
+  <!--</viewer>-->
+  <cm-scroll style="width: 100%;" [book]="book"></cm-scroll>
 </section>
 <section class="layer">
-  <section class="panel progress" *ngIf="book?.total">
-    {{book?.current}}<span style="opacity: 0.75;margin: 0 2px 0 4px;">/</span>{{book?.total}}
-  </section>
+<section class="panel progress" *ngIf="book?.total">
+{{book?.current}}<span style="opacity: 0.75;margin: 0 2px 0 4px;">/</span>{{book?.total}}
+</section>
 </section>

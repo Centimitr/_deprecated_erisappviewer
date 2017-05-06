@@ -1,0 +1,42 @@
+:host {
+  display: flex;
+  position: relative;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.loading {
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /*color: white;*/
+  font-family: "American Typewriter", monospace;
+  opacity: 0.8;
+}
+
+.loading.hide {
+  opacity: 0;
+  transition: opacity 275ms ease-in;
+}
+
+.loading .words {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+}
+
+.loading .words .page {
+  font-size: 4vh;
+  margin-bottom: 1vh;
+}
+
+.loading .words .status {
+  font-size: 2.5vh;
+  opacity: 0.8;
+}

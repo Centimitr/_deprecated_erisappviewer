@@ -4,29 +4,28 @@ import {FormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 
 import {AppComponent} from './app.component';
-import {ViewerComponent} from './viewer/viewer.component';
 import {TrustResourceUrlPipe} from './trust-resource-url.pipe';
 import {ReaderComponent} from './reader/reader.component';
-import {PageHeightPipe} from './page-height.pipe';
 import {AppMenu} from "./lib/menu";
 import {AppStorage} from "./lib/storage";
-import {CoverService} from "./cover.service";
-import {RenderService} from "./render.service";
+import {ImageComponent} from './image/image.component';
+import {ScrollComponent} from './scroll/scroll.component';
+import {Config} from "./config.service";
 
 @NgModule({
   declarations: [
     AppComponent,
-    ViewerComponent,
     ReaderComponent,
     TrustResourceUrlPipe,
-    PageHeightPipe
+    ImageComponent,
+    ScrollComponent,
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpModule
   ],
-  providers: [AppMenu, AppStorage, RenderService],
+  providers: [AppMenu, AppStorage, Config],
   bootstrap: [AppComponent]
 })
 export class AppModule {

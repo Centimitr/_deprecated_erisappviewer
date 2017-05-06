@@ -9,3 +9,16 @@
   font-family: "PingFang SC", sans-serif;
   cursor: default;
 }
+
+/*canvas {*/
+  /*animation: canvas-enter 250ms ease-in;*/
+/*}*/
+
+@keyframes canvas-enter {
+  from {
+    opacity: 0
+  }
+  to {
+    opacity: 1
+  }
+}

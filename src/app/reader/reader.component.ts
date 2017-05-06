@@ -11,8 +11,7 @@ import {
 } from "../lib/touchbar";
 import {ABMap, LRU, RustyLock} from "../lib/util";
 import {Book} from "./book";
-import {ViewerComponent} from "../viewer/viewer.component";
-import {CheckInterface, Config} from "./config";
+import {CheckInterface, Config} from "../config.service";
 import {AppMenu} from "../lib/menu";
 import {Title} from "@angular/platform-browser";
 import {AppStorage} from "app/lib/storage";
@@ -29,22 +28,18 @@ export class ReaderComponent implements OnChanges {
   @Input() path: string;
   @Input() refresh: number;
   book: Book;
-  config: Config;
   @Output() ok = new EventEmitter<null>();
   @Output() fail = new EventEmitter<any>();
   elm: HTMLElement;
   private pageList = [];
-
-  @ViewChildren(ViewerComponent) viewers: QueryList<ViewerComponent>;
 
   // todo: multi-viewer: cache and better loading
 
   @HostListener('window:contextmenu', ['$event']) onRightClick() {
   }
 
-  constructor(private zone: NgZone, private title: Title, private m: AppMenu, private s: AppStorage, elm: ElementRef) {
+  constructor(private zone: NgZone, private title: Title, private m: AppMenu, private s: AppStorage, elm: ElementRef, private config: Config) {
     this.elm = elm.nativeElement;
-    this.config = new Config();
   }
 
   update(page: number, leave?: boolean) {
@@ -59,6 +54,8 @@ export class ReaderComponent implements OnChanges {
 
   async ngOnChanges(changes) {
     if (changes.path && this.path) {
+      this.config.clear();
+      console.log('CLEAR');
       this.book = new Book(this.path, this.config);
       let e = await this.book.init();
       if (e) {
@@ -68,10 +65,11 @@ export class ReaderComponent implements OnChanges {
       this.book.meta.Pages.forEach((p, i) => p['i'] = i);
       this.ok.emit();
       this.title.setTitle(this.book.meta.Name);
-      this.viewers.changes.subscribe(() => {
-        this.book.bind(this.viewers.map(v => v));
-      });
-      this.config.clear();
+
+      if (this.book.meta.Pages.length > 256) {
+        alert('Now manga with more than 256 pages is not supported, the first 256 pages are displayed.');
+        this.book.meta.Pages = this.book.meta.Pages.slice(0, 256);
+      }
 
       // turn to specific page
       setTimeout(() => {
@@ -91,24 +89,20 @@ export class ReaderComponent implements OnChanges {
       });
       // scale and view
       const barViewMap = new ABMap(Config.VIEW_ALL);
-      const barModeMap = new ABMap(Config.MODE_ALL);
+      const barScaleMap = new ABMap(Config.SCALE_ALL);
       const setView = i => {
         this.zone.run(() => {
           this.config.view.set(barViewMap.getB(i));
         });
       };
-      const setMode = i => {
+      const setScale = i => {
         this.zone.run(() => {
-          this.config.mode.set(barModeMap.getB(i));
+          this.config.scale.set(barScaleMap.getB(i));
+          ``
         });
       };
-      //pinch
-      this.config.pinch.change(v => {
-        if (this.config.mode.is(Config.MODE_DEFAULT)) {
-          const to = this.config.scale.get() * ((v - 1) * 0.8 + 1);
-          this.config.scale.set(to);
-        }
-      });
+      // todo: pinch
+      this.config.pinch.change(v => 0);
 
       // menu
       const re = this.s.get('menu.recentlyEnjoyed');
@@ -145,8 +139,8 @@ export class ReaderComponent implements OnChanges {
         label,
         accelerator: `CmdOrCtrl+Alt+${i + 1}`,
         type: 'radio',
-        click: () => setMode(i),
-        checked: barModeMap.getA(this.config.mode.get()) === i
+        click: () => setScale(i),
+        checked: barScaleMap.getA(this.config.scale.get()) === i
       }));
       // .concat([zoomInItem, zoomOutItem]);
       const goItems = ['First Page', 'Go to..', 'Previous Page', 'Next Page'].map((label, i) => new MenuItem({
@@ -190,15 +184,19 @@ export class ReaderComponent implements OnChanges {
       // touchBar
       const getProgressStr = (current: number = this.book.current) => current + '/' + this.book.total;
       const lock = new RustyLock();
+      let barProgLastValue;
       const slider = new TouchBarSlider({
         label: getProgressStr(),
         value: this.book.current,
         minValue: 1,
         maxValue: this.book.total,
         change: (current: number) => {
-          slider.label = getProgressStr(current);
-          this.zone.run(() => this.book.go(current));
-          lock.lock(175);
+          if (barProgLastValue !== current) {
+            barProgLastValue = current;
+            slider.label = getProgressStr(current);
+            this.zone.run(() => this.book.go(current));
+            // lock.lock(250);
+          }
         }
       });
       const viewCtrl = new TouchBarSegmentedControl({
@@ -215,8 +213,8 @@ export class ReaderComponent implements OnChanges {
           {label: 'Default'},
           {label: 'Width'},
         ],
-        selectedIndex: barModeMap.getA(this.config.mode.get()),
-        change: setMode
+        selectedIndex: barScaleMap.getA(this.config.scale.get()),
+        change: setScale
       });
       this.book.onPage((current) => {
         lock.run(() => {
@@ -243,17 +241,9 @@ export class ReaderComponent implements OnChanges {
         const index = Config.VIEW_ALL.indexOf(n);
         viewItems.filter((item, i) => i === index).forEach(item => item.checked = true);
         viewCtrl.selectedIndex = index;
-        const viewer = this.viewers.filter((v, i) => i + 1 === this.book.current)[0];
-        viewer.getPos();
-        // hack view change
-        if (n === Config.VIEW_CONTINUOUS_SCROLL) {
-          setTimeout(() => {
-            viewer.scrollTo();
-          }, 0);
-        }
       });
-      this.config.mode.change(n => {
-        const index = Config.MODE_ALL.indexOf(n);
+      this.config.scale.change(n => {
+        const index = Config.SCALE_ALL.indexOf(n);
         modeItems.filter((item, i) => i === index).forEach(item => item.checked = true);
         modeCtrl.selectedIndex = index;
       });
@@ -276,16 +266,16 @@ export class ReaderComponent implements OnChanges {
     }
   };
 
-  setScaleConstraint() {
-    this.config.setScaleConstraint(this.book, this.elm, this.viewers);
-  }
+  // setScaleConstraint() {
+  //   this.config.setScaleConstraint(this.book, this.elm, this.viewers);
+  // }
 
-  @HostListener('window:resize', ['$event']) onResize() {
-    console.warn('RESIZED!');
-    setTimeout(() => {
-      this.setScaleConstraint();
-    }, 0);
-  }
+  // @HostListener('resize', ['$event']) onResize() {
+  //   alert(1)
+  // setTimeout(() => {
+  //   this.setScaleConstraint();
+  // }, 0);
+  // }
 
   inCacheRange(page: number): boolean {
     // let distance = 1e10;
@@ -311,8 +301,10 @@ export class ReaderComponent implements OnChanges {
 
   @HostListener('window:mousewheel', ['$event'])
   async onWheel(e) {
-    e.preventDefault();
-    if (e.ctrlKey) this.config.pinch.set(Math.exp(-e.deltaY / 100));
-    else this.elm.firstElementChild.scrollTop += e.deltaY * (this.config.natureScroll ? 1 : -1);
+    // e.preventDefault();
+    requestAnimationFrame(() => {
+      // if (e.ctrlKey) this.config.pinch.set(Math.exp(-e.deltaY / 100));
+      // else this.elm.firstElementChild.scrollTop += e.deltaY * (this.config.natureScroll ? 1 : -1);
+    });
   }
 }

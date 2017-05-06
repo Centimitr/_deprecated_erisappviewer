@@ -142,3 +142,22 @@ export class LRU {
     return this.q;
   }
 }
+
+export class LatestRunner {
+  busy: boolean = false;
+  wait: () => Promise<any>;
+
+  async run(fn: () => Promise<any>) {
+    if (!this.busy) {
+      this.busy = true;
+      await fn();
+      if (this.wait) {
+        await this.wait();
+        this.wait = null;
+      }
+      this.busy = false;
+    } else {
+      this.wait = fn;
+    }
+  }
+}

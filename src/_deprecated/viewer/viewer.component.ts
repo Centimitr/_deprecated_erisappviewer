@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 import {PageMeta} from "../reader/meta";
 import {Change, Checker, Semaphore} from "../lib/util";
-import {Config} from "../reader/config";
+import {Config} from "../config.service";
 
 @Component({
   selector: 'viewer',
@@ -60,17 +60,17 @@ export class ViewerComponent implements OnInit {
           const h = Math.min(Math.max(rect.bottom, 0), window.innerWidth) - Math.max(rect.top, 0);
           return (w * h) / Math.min(rect.width * rect.height, window.innerWidth * window.innerHeight)
         };
-        checker.check(() => {
-          const ratio = getRatio(this.elm.getBoundingClientRect());
-          const FOCUS_RATIO = 0.35;
-          if (ratio > FOCUS_RATIO) {
-            return true;
-          }
-        }, () => {
-          this.zone.run(() => {
-            this.attention.emit();
-          });
-        }, 1);
+        // checker.check(() => {
+        //   const ratio = getRatio(this.elm.getBoundingClientRect());
+        //   const FOCUS_RATIO = 0.35;
+        //   if (ratio > FOCUS_RATIO) {
+        //     return true;
+        //   }
+        // }, () => {
+        //   this.zone.run(() => {
+        //     this.attention.emit();
+        //   });
+        // }, 1);
       } else {
         checker.clear();
         this.leave.emit();
@@ -82,7 +82,7 @@ export class ViewerComponent implements OnInit {
     this.config.scale.change(() => this.zone.run(() => this.setHeight()));
   }
 
-  @HostListener('window:resize', ['$event']) onResize() {
+  @HostListener('resize', ['$event']) onResize() {
     setTimeout(()=>{
       this.setHeight();
     });

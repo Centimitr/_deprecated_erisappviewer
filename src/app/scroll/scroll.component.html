@@ -1,0 +1,6 @@
+<div style="height: 5vh; width: 100%;"></div>
+<cm-image *ngFor="let p of book?.meta?.Pages; let i=index;"
+          style="margin-bottom: 3vh"
+          [src]="book.getPageFilePath(p.Locator)"
+></cm-image>
+<div style="height: 2vh; width: 100%;"></div>
