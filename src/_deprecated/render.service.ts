@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable} from "@angular/core";
 const {getCurrentWindow} = window['require']('electron').remote;
 
 @Injectable()

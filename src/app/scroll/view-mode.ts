@@ -1,7 +1,6 @@
 import {Config} from "../config.service";
 import {ImageComponent} from "../image/image.component";
 import {Book} from "../reader/book";
-import {time} from "../lib/time";
 import {CacheManager} from "./cache-manager";
 import {LatestRunner} from "../lib/util";
 
@@ -40,10 +39,8 @@ class ViewSinglePage implements ViewMode {
   private last: ImageComponent;
 
   async check(page: number) {
-    console.warn('CHECK!');
     const cur = this.imgs[page - 1];
     await this.manager.request(page - 1);
-    console.warn('CHECK: request ok');
     if (this.last) {
       this.last.hide();
     }

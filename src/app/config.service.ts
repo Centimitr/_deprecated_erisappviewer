@@ -1,7 +1,8 @@
-import {Injectable, Query, QueryList} from "@angular/core";
+import {Injectable} from "@angular/core";
 import {Scale} from "./image/scale";
 let cnt = 0;
 const pt = v => console.log(cnt++, v);
+
 export interface CheckInterface {
   ok: boolean;
   err?: string;

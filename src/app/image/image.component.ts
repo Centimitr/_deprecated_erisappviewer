@@ -1,6 +1,5 @@
-import {Component, ElementRef, Input, OnInit} from '@angular/core';
+import {Component, ElementRef, Input, OnInit} from "@angular/core";
 import {Range} from "./range";
-import {time} from "../lib/time";
 import {Config} from "../config.service";
 import {Scale} from "./scale";
 import {Size} from "./size";
@@ -71,7 +70,6 @@ export class ImageComponent implements OnInit {
       this.canvas.style.boxShadow = '0 0 12px 4px rgba(0,0,0,.382)';
       this.showing = true;
       this.showLock = false;
-      window['e'] = this;
     }
   }
 

@@ -1,17 +1,8 @@
-import {
-  Component, OnInit, Input, HostListener, NgZone, OnChanges, ViewChildren, QueryList,
-  Output, EventEmitter, ElementRef, ContentChild
-} from '@angular/core';
-import {
-  setTouchBar,
-  TouchBarButton,
-  TouchBarSlider,
-  TouchBarSegmentedControl,
-  TouchBarScrubber
-} from "../lib/touchbar";
+import {Component, ElementRef, EventEmitter, HostListener, Input, NgZone, OnChanges, Output} from "@angular/core";
+import {setTouchBar, TouchBarSegmentedControl, TouchBarSlider} from "../lib/touchbar";
 import {ABMap, LRU, RustyLock} from "../lib/util";
 import {Book} from "./book";
-import {CheckInterface, Config} from "../config.service";
+import {Config} from "../config.service";
 import {AppMenu} from "../lib/menu";
 import {Title} from "@angular/platform-browser";
 import {AppStorage} from "app/lib/storage";
@@ -90,7 +81,6 @@ export class ReaderComponent implements OnChanges {
       // scale and view
       const barViewMap = new ABMap(Config.VIEW_ALL);
       const barScaleMap = new ABMap(Config.SCALE_ALL);
-      console.log(barScaleMap);
       const setView = i => {
         this.zone.run(() => {
           this.config.view.set(barViewMap.getB(i));

@@ -1,6 +1,6 @@
-import {Component, HostListener, NgZone, OnInit} from '@angular/core';
+import {Component, HostListener, NgZone, OnInit} from "@angular/core";
 import args from "./lib/args";
-import {AppMenu, Menu, MenuItem, alwaysOnTopItem} from "./lib/menu";
+import {alwaysOnTopItem, AppMenu, Menu, MenuItem} from "./lib/menu";
 import {AppStorage, AppStorageValue, KeyValue} from "./lib/storage";
 import {Title} from "@angular/platform-browser";
 const electron = window['require']('electron');

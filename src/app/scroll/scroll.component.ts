@@ -1,11 +1,7 @@
-import {
-  Component, ContentChildren, ElementRef, HostListener, Input, OnChanges, OnInit, QueryList,
-  ViewChildren
-} from '@angular/core';
+import {Component, ElementRef, HostListener, Input, OnInit, QueryList, ViewChildren} from "@angular/core";
 import {Book} from "../reader/book";
-import {Config, ConfigItem} from "../config.service";
+import {Config} from "../config.service";
 import {ImageComponent} from "../image/image.component";
-import {time} from "../lib/time";
 import {ABMap} from "../lib/util";
 import {viewCS, viewSP} from "./view-mode";
 import {CacheManager} from "./cache-manager";
@@ -21,29 +17,24 @@ export class ScrollComponent implements OnInit {
   @Input() book: Book;
   @ViewChildren(ImageComponent) imgs: QueryList<ImageComponent>;
 
-  constructor(private config: Config, elm: ElementRef) {
-    // setInterval(() => {
-    //   if (this.check) {
-    //     this.check();
-    //     console.log('c')
-    //   }
-    // }, 2000);
-  }
+  constructor(private config: Config, elm: ElementRef) {}
 
   ngOnInit() {
   }
-
-  check: Function;
 
   ngAfterViewInit() {
     let check;
     const barViewMap = new ABMap(Config.VIEW_ALL);
     this.imgs.changes.subscribe(async (changes) => {
+
+      // binding
       const imgs = this.imgs.map(img => img);
       const manager = new CacheManager(this.config, imgs);
       viewCS.bind(imgs, manager);
       viewSP.bind(imgs, manager);
-      manager.debug();
+      // manager.debug();
+
+      // set check function
       if (!imgs.length) return;
       let checkCurView;
       check = (newIndex?: number) => {
@@ -61,7 +52,6 @@ export class ScrollComponent implements OnInit {
         }
         if (!checkCurView) debugger;
         checkCurView();
-        console.log('first.');
       };
       check(this.config.view.get());
       this.config.view.change(n => check(n));

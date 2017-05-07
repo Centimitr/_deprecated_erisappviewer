@@ -1,4 +1,3 @@
-import {extract} from "@fknop/node-unrar/lib";
 import {fs} from "./fs";
 const os = require('os');
 const _path = require('path');
