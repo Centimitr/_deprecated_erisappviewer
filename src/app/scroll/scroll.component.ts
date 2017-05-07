@@ -64,7 +64,7 @@ export class ScrollComponent implements OnInit {
         console.log('first.');
       };
       check(this.config.view.get());
-      this.config.view.change(n => check(n))
+      this.config.view.change(n => check(n));
     });
   }
 

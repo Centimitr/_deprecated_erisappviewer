@@ -66,9 +66,9 @@ export class ReaderComponent implements OnChanges {
       this.ok.emit();
       this.title.setTitle(this.book.meta.Name);
 
-      if (this.book.meta.Pages.length > 256) {
+      if (this.book.meta.Pages.length > 512) {
         alert('Now manga with more than 256 pages is not supported, the first 256 pages are displayed.');
-        this.book.meta.Pages = this.book.meta.Pages.slice(0, 256);
+        this.book.meta.Pages = this.book.meta.Pages.slice(0, 512);
       }
 
       // turn to specific page
@@ -90,6 +90,7 @@ export class ReaderComponent implements OnChanges {
       // scale and view
       const barViewMap = new ABMap(Config.VIEW_ALL);
       const barScaleMap = new ABMap(Config.SCALE_ALL);
+      console.log(barScaleMap);
       const setView = i => {
         this.zone.run(() => {
           this.config.view.set(barViewMap.getB(i));
@@ -98,7 +99,7 @@ export class ReaderComponent implements OnChanges {
       const setScale = i => {
         this.zone.run(() => {
           this.config.scale.set(barScaleMap.getB(i));
-          ``
+          console.table(this.config.scale.get())
         });
       };
       // todo: pinch
@@ -125,16 +126,6 @@ export class ReaderComponent implements OnChanges {
         click: () => setView(i),
         checked: barViewMap.getA(this.config.view.get()) === i,
       }));
-      // const zoomInItem = new MenuItem({
-      //   label: 'Zoom In',
-      //   accelerator: 'CmdOrCtrl+Plus',
-      //   click: () => this.zone.run(() => this.config.scale.set(this.config.scale.get() + this.config.ui.view.zoomUnit))
-      // });
-      // const zoomOutItem = new MenuItem({
-      //   label: 'Zoom Out',
-      //   accelerator: 'CmdOrCtrl+-',
-      //   click: () => this.zone.run(() => this.config.scale.set(this.config.scale.get() - this.config.ui.view.zoomUnit))
-      // });
       const modeItems = ['Full Page', 'Default', 'Width FullFilled'].map((label, i) => new MenuItem({
         label,
         accelerator: `CmdOrCtrl+Alt+${i + 1}`,
@@ -224,7 +215,6 @@ export class ReaderComponent implements OnChanges {
       });
       setTouchBar([
         viewCtrl,
-        // new TouchBarButton({label: 'Page 1', click: () => this.zone.run(() => this.book.go(1))}),
         slider,
         // new TouchBarScrubber({
         //   items: (new Array(this.book.total)).fill(1).map((v, i) => '' + i).map(i => ({label: i})),
@@ -233,7 +223,6 @@ export class ReaderComponent implements OnChanges {
         //   selectedStyle: 'outline',
         // }),
         modeCtrl,
-        // new TouchBarButton({label: 'ZoomOut', click: () => this.zoom(-10)}),
       ]);
 
       // update menu and touchBar
@@ -276,20 +265,6 @@ export class ReaderComponent implements OnChanges {
   //   this.setScaleConstraint();
   // }, 0);
   // }
-
-  inCacheRange(page: number): boolean {
-    // let distance = 1e10;
-    // this.recorder.stack.map(id => parseInt(id)).forEach(p => {
-    //   const d = p - page;
-    //   if (Math.abs(d) < Math.abs(distance)) {
-    //     distance = d;
-    //   }
-    // });
-    const distance = page - this.book.current;
-    const BACKWARD = 3;
-    const FORWARD = 7;
-    return -1 * BACKWARD <= distance && distance <= FORWARD;
-  }
 
   @HostListener('click', ['$event']) onClick() {
     this.book.next()

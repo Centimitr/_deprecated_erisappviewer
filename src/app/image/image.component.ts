@@ -36,6 +36,7 @@ export class ImageComponent implements OnInit {
   constructor(elm: ElementRef, private config: Config) {
     this.elm = elm.nativeElement;
     this.setHeight(375);
+    this.config.scale.change(()=> this.resize());
   }
 
   async ngOnInit() {

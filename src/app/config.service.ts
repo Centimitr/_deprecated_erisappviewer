@@ -1,5 +1,3 @@
-import {ViewerComponent} from "./viewer/viewer.component";
-import {Book} from "app/reader/book";
 import {Injectable, Query, QueryList} from "@angular/core";
 import {Scale} from "./image/scale";
 let cnt = 0;
@@ -21,7 +19,6 @@ export class ConfigItem<T> {
 
   set(v: T): boolean {
     if (this._lock) return false;
-    console.log('s', v);
     const old = this.value;
     if (old !== v) {
       this.value = v;
@@ -120,7 +117,7 @@ export class Config {
   static SCALE_DEFAULT = new Scale(null, 100, null, 150);
   static SCALE_MAXHEIGHT = new Scale(null, 100, null, 100);
   static SCALE_FULLWIDTH = new Scale(100, 100, null, null);
-  static SCALE_ALL: Scale[] = [Config.SCALE_DEFAULT, Config.SCALE_MAXHEIGHT, Config.SCALE_FULLWIDTH];
+  static SCALE_ALL: Scale[] = [Config.SCALE_MAXHEIGHT, Config.SCALE_DEFAULT, Config.SCALE_FULLWIDTH];
   scale = new ConfigItem<Scale>(Config.SCALE_DEFAULT);
 
   // mode

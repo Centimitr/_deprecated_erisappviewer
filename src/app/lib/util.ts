@@ -47,8 +47,8 @@ export class Checker {
 }
 
 export class ABMap {
-  mapA: object = {};
-  mapB: object = {};
+  mapA: Map<any, any> = new Map();
+  mapB: Map<any, any> = new Map();
 
   constructor(enumArr?: any[]) {
     if (enumArr) {
@@ -57,16 +57,16 @@ export class ABMap {
   }
 
   set(a: any, b: any) {
-    this.mapA[a] = b;
-    this.mapB[b] = a;
+    this.mapA.set(a, b);
+    this.mapB.set(b, a);
   }
 
   getA(b: any) {
-    return this.mapB[b];
+    return this.mapB.get(b);
   }
 
   getB(a: any) {
-    return this.mapA[a];
+    return this.mapA.get(a);
   }
 }
 
