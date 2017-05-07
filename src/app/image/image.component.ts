@@ -30,12 +30,13 @@ const px = function (v: number) {
 })
 export class ImageComponent implements OnInit {
   @Input() src: string;
+  @Input() page: number;
   elm: any;
 
   constructor(elm: ElementRef, private config: Config) {
     this.elm = elm.nativeElement;
     this.setHeight(375);
-    this.config.scale.change(()=> this.resize());
+    this.config.scale.change(() => this.resize());
   }
 
   async ngOnInit() {
@@ -76,7 +77,7 @@ export class ImageComponent implements OnInit {
   resize() {
     if (!this.canvas) return;
     const container = this.elm.parentNode.parentNode;
-    const mode:Scale = this.config.scale.get();
+    const mode: Scale = this.config.scale.get();
     let s = mode.calc({
       w: container.offsetWidth,
       h: container.offsetHeight
@@ -105,13 +106,25 @@ export class ImageComponent implements OnInit {
     return this;
   }
 
-  distance() {
+  distance(): number {
     const min = this.elm.offsetTop - this.elm.offsetParent.clientHeight;
     const max = this.elm.offsetTop + this.elm.offsetHeight;
     return new Range(min, max).distance(this.elm.offsetParent.scrollTop);
   }
 
-  inView() {
+  ratio(): number {
+    const r = this.elm.getBoundingClientRect();
+    const pr = this.elm.offsetParent.getBoundingClientRect();
+    const xr = new Range(pr.left, pr.right);
+    const yr = new Range(pr.top, pr.bottom);
+    const w = xr.near(r.right) - xr.near(r.left);
+    const h = yr.near(r.bottom) - yr.near(r.top);
+    const cw = Math.min(r.width, pr.width);
+    const ch = Math.min(r.height, pr.height);
+    return (w * h) / (cw * ch);
+  }
+
+  inView(): boolean {
     return this.distance() === 0;
   }
 

@@ -1,6 +1,7 @@
 import {BookMeta} from "./meta";
 import args from "../lib/args";
 import {Config} from "../config.service";
+import {ImageComponent} from "../image/image.component";
 
 export class Book {
   locator: string;
@@ -21,7 +22,9 @@ export class Book {
   set current(page: number) {
     const old = this._current;
     this._current = page;
-    this._onPage.forEach(cb => cb(page, old));
+    if (old !== page) {
+      this._onPage.forEach(cb => cb(page, old));
+    }
   }
 
   async init(): Promise<any> {
@@ -51,12 +54,22 @@ export class Book {
     return ok;
   }
 
+  // used for go in continuous scroll mode
+  private imgs: ImageComponent[];
+
+  bind(imgs: ImageComponent[]) {
+    this.imgs = imgs;
+  }
+
   go(pageOrOffset: number, relative: boolean = false): boolean {
     const page = relative ? this.current + pageOrOffset : pageOrOffset;
     const ok = this.checkPage(page);
     if (ok) {
       if (this.config.isSinglePage()) {
         this.current = page;
+      }else if (this.config.isContinuousScroll()){
+        const img = this.imgs[page-1];
+        img.scrollTo();
       }
     }
     return ok;

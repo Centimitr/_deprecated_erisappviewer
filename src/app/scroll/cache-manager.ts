@@ -40,36 +40,40 @@ export class CacheManager {
   constructor(private config: Config, private imgs: ImageComponent[]) {
   }
 
-  private getPreloadTasks(index): Promise<any>[] {
+  private getPreloadTasks(indexes: number[]): Promise<any>[] {
     const d = this.config.scrollDirection ? 1 : -1;
-    const from = Math.max(0, index + d);
-    const to = Math.max(0, index + d * NEXT_PRELOAD);
+    const startPoint = d ? Math.max(...indexes) : Math.min(...indexes);
+    let from = Math.max(0, startPoint + d);
+    let to = Math.max(0, startPoint + d * NEXT_PRELOAD);
+    if (to < from) [to, from] = [from, to];
     return this.imgs.slice(from, to).map(img => img.paint());
   }
 
-  private getCleanTasks(index): Promise<any>[] {
-    const to = Math.max(0, index - BACKWARD_RESERVE);
-    const from = index + FORWARD_RESERVE;
+  private getCleanTasks(indexes: number[]): Promise<any>[] {
+    const to = Math.max(0, Math.min(...indexes) - BACKWARD_RESERVE);
+    const from = Math.max(...indexes) + FORWARD_RESERVE;
     return this.imgs.slice(0, to).concat(this.imgs.slice(from)).map(img => (async () => img.clear())());
   }
 
   minor = new MinorQueue();
   latest = new LatestRunner();
 
-  async request(index: number) {
+  async request(...indexes: number[]) {
     await this.latest.run(async () => {
       await this.minor.stop();
-      await this.imgs[index].paint();
+      for (let i = 0; i < indexes.length; i++) {
+        await this.imgs[indexes[i]].paint();
+      }
       let tasks = [];
-      tasks = tasks.concat(this.getPreloadTasks(index), this.getCleanTasks(index));
+      tasks = tasks.concat(this.getPreloadTasks(indexes), this.getCleanTasks(indexes));
       this.minor.run(tasks);
     });
   }
 
   debug() {
-    // setInterval(() => {
-    //   console.clear();
-    //   console.table(this.imgs.map((img, i) => ({index: i, showing: img.showing ? '*' : undefined})));
-    // }, 500);
+    setInterval(() => {
+      console.clear();
+      console.table(this.imgs.map((img, i) => ({index: i, showing: img.showing ? '*' : undefined})));
+    }, 500);
   }
 }

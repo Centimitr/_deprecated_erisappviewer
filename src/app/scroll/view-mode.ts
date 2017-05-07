@@ -3,6 +3,7 @@ import {ImageComponent} from "../image/image.component";
 import {Book} from "../reader/book";
 import {CacheManager} from "./cache-manager";
 import {LatestRunner} from "../lib/util";
+import {time} from "../lib/time";
 
 interface ViewMode {
   is(any): boolean;
@@ -68,18 +69,33 @@ class ViewContinuousScroll implements ViewMode {
     this.manager = manager;
   }
 
-  // private imgs: ImageComponent[];
-  before(curPage?: number) {
+  onPage: any;
+
+  before(config: Config, book: Book) {
     this.imgs.forEach(img => img.show());
-    this.imgs[curPage - 1].scrollTo();
+    this.imgs[book.current - 1].scrollTo();
+    const r = new LatestRunner();
+    setInterval(() => {
+      const r = this.imgs.map((img, i) => ({i: i, r: img.ratio()})).filter(x => x.r > 0.45);
+      const d = config.scrollDirection;
+      const focus = d ? r.pop() : r.shift();
+      if (focus) {
+        book.updateCurrent(focus.i + 1);
+      }
+    }, 300);
+    this.onPage = (n: number) => {
+      r.run(() => this.check())
+    };
+    book.onPage(this.onPage);
   }
 
-  check(page: number) {
-
+  async check() {
+    const showingIndex = this.imgs.map((img, i) => ({i: i, inView: img.inView()})).filter(x => x.inView).map(x => x.i);
+    await this.manager.request(...showingIndex);
   }
 
-  after() {
-
+  after(book: Book) {
+    book.onPageRemove(this.onPage);
   }
 }
 

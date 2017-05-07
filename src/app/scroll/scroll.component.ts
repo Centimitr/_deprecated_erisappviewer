@@ -17,7 +17,8 @@ export class ScrollComponent implements OnInit {
   @Input() book: Book;
   @ViewChildren(ImageComponent) imgs: QueryList<ImageComponent>;
 
-  constructor(private config: Config, elm: ElementRef) {}
+  constructor(private config: Config, elm: ElementRef) {
+  }
 
   ngOnInit() {
   }
@@ -32,6 +33,7 @@ export class ScrollComponent implements OnInit {
       const manager = new CacheManager(this.config, imgs);
       viewCS.bind(imgs, manager);
       viewSP.bind(imgs, manager);
+      this.book.bind(imgs);
       // manager.debug();
 
       // set check function
@@ -42,10 +44,10 @@ export class ScrollComponent implements OnInit {
         if (newIndex !== undefined) {
           if (viewCS.is(newValue)) {
             viewSP.after(this.book);
-            viewCS.before(this.book.current);
-            checkCurView = () => viewCS.check(this.book.current);
+            viewCS.before(this.config, this.book);
+            checkCurView = () => viewCS.check();
           } else if (viewSP.is(newValue)) {
-            viewCS.after();
+            viewCS.after(this.book);
             viewSP.before(this.book);
             checkCurView = () => viewSP.check(this.book.current);
           } else debugger;

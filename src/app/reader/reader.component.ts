@@ -267,9 +267,10 @@ export class ReaderComponent implements OnChanges {
   @HostListener('window:mousewheel', ['$event'])
   async onWheel(e) {
     // e.preventDefault();
-    requestAnimationFrame(() => {
-      // if (e.ctrlKey) this.config.pinch.set(Math.exp(-e.deltaY / 100));
-      // else this.elm.firstElementChild.scrollTop += e.deltaY * (this.config.natureScroll ? 1 : -1);
-    });
+    // requestAnimationFrame(() => {
+    // if (e.ctrlKey) this.config.pinch.set(Math.exp(-e.deltaY / 100));
+    // else this.elm.firstElementChild.scrollTop += e.deltaY * (this.config.natureScroll ? 1 : -1);
+    // });
+    this.config.scrollDirection = e.deltaY > 0;
   }
 }
