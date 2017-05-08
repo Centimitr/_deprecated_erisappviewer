@@ -8,6 +8,7 @@ const getSubBookNames = function (pms: PageMeta[]) {
   pms.forEach(pm => m.set(pm.SubBook, 1));
   return Array.from(m.keys()).sort((a, b) => a.length - b.length);
 };
+const {webFrame} = window['require']('electron');
 
 export class Book {
   locator: string;
@@ -35,6 +36,7 @@ export class Book {
 
   subBooks: string[];
   curSubBook: string;
+  private _onSubBook: Function[] = [];
 
   async init(): Promise<any> {
     await args.wait();
@@ -47,10 +49,16 @@ export class Book {
     this.setSubBook(this.subBooks[0]);
   }
 
+  onSubBook(fn: Function) {
+    this._onSubBook.push(fn);
+  }
+
   setSubBook(name: string) {
+    webFrame.clearCache();
     this.curSubBook = name;
     this.current = 1;
     this.total = this.pages().length;
+    this._onSubBook.forEach(fn => fn());
   }
 
   pages() {

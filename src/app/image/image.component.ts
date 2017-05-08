@@ -94,14 +94,9 @@ export class ImageComponent implements OnInit {
   }
 
   checkOverflow() {
-    console.log(this.page);
     try {
       if (this.config.isSinglePage()) {
         const p = this.elm.parentNode.parentNode;
-        // const overflow = p.scrollHeight > p.clientHeight;
-        // console.log(this.page, overflow);
-        // if (!overflow) {
-        // }
         const threshold = p.clientHeight - window.innerHeight * (5 + 5) / 100;
         const shouldCenter = threshold > this._height;
         if (shouldCenter) {
@@ -145,7 +140,6 @@ export class ImageComponent implements OnInit {
   ratio(): number {
     const r = this.elm.getBoundingClientRect();
     if (!this.elm.offsetParent) {
-      console.trace('bounding');
       return 0;
     }
     const pr = this.elm.offsetParent.getBoundingClientRect();

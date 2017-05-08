@@ -189,6 +189,10 @@ export class ReaderComponent implements OnChanges {
           slider.label = getProgressStr(current);
         })
       });
+      this.book.onSubBook(()=>{
+        slider.maxValue = this.book.total;
+        slider.label = getProgressStr(this.book.current);
+      });
       setTouchBar([
         viewCtrl,
         slider,
@@ -214,7 +218,6 @@ export class ReaderComponent implements OnChanges {
       });
     }
   }
-
 
   // setScaleConstraint() {
   //   this.config.setScaleConstraint(this.book, this.elm, this.viewers);
