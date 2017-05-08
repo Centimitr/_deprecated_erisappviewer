@@ -99,9 +99,9 @@ export class Config {
   // appearance
   ui: any = {
     view: {
-      before: 50,
-      after: 50,
-      intervalCorrection: 50,
+      before: 5,
+      after: 0,
+      eachAfter: 5,
       zoomUnit: 5
     }
   };

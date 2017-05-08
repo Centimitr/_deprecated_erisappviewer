@@ -47,6 +47,7 @@ export class ImageComponent implements OnInit {
   showing: boolean = false;
   showLock: boolean = false;
   reject: boolean = false;
+  private _height: number;
 
   private async cache() {
     this.reject = false;
@@ -66,7 +67,7 @@ export class ImageComponent implements OnInit {
       this.showLock = true;
       await this.cache();
       if (this.reject) return;
-      this.resize();
+      this.resize(false);
       this.elm.appendChild(this.canvas);
       this.canvas.style.boxShadow = '0 0 12px 4px rgba(0,0,0,.382)';
       this.showing = true;
@@ -74,7 +75,7 @@ export class ImageComponent implements OnInit {
     }
   }
 
-  resize() {
+  resize(checkOverflow: boolean = true) {
     if (!this.canvas) return;
     try {
       const p = this.elm.parentNode.parentNode;
@@ -84,9 +85,33 @@ export class ImageComponent implements OnInit {
         h: p.offsetHeight
       }, this.size);
       this.canvas.style.zoom = s;
-      this.setHeight(this.size.h * s)
+      this.setHeight(this.size.h * s);
+      if (checkOverflow) this.checkOverflow();
     } catch (e) {
+      console.warn(e);
       // this catch is because when submenu changing, parentNode may be null
+    }
+  }
+
+  checkOverflow() {
+    console.log(this.page);
+    try {
+      if (this.config.isSinglePage()) {
+        const p = this.elm.parentNode.parentNode;
+        // const overflow = p.scrollHeight > p.clientHeight;
+        // console.log(this.page, overflow);
+        // if (!overflow) {
+        // }
+        const threshold = p.clientHeight - window.innerHeight * (5 + 5) / 100;
+        const shouldCenter = threshold > this._height;
+        if (shouldCenter) {
+          const offset = (threshold - this._height) / 2;
+          this.elm.style.marginTop = px(offset);
+          return;
+        }
+      }
+      this.elm.style.marginTop = null;
+    } catch (e) {
     }
   }
 
@@ -101,6 +126,7 @@ export class ImageComponent implements OnInit {
   }
 
   show() {
+    this.checkOverflow();
     this.elm.style.display = 'flex';
     return this;
   }
@@ -118,6 +144,10 @@ export class ImageComponent implements OnInit {
 
   ratio(): number {
     const r = this.elm.getBoundingClientRect();
+    if (!this.elm.offsetParent) {
+      console.trace('bounding');
+      return 0;
+    }
     const pr = this.elm.offsetParent.getBoundingClientRect();
     const xr = new Range(pr.left, pr.right);
     const yr = new Range(pr.top, pr.bottom);
@@ -133,6 +163,7 @@ export class ImageComponent implements OnInit {
   }
 
   setHeight(h: number) {
+    this._height = h;
     this.elm.style.height = px(h);
   }
 

@@ -36,7 +36,6 @@ export class ReaderComponent implements OnChanges {
         this.fail.emit(e);
         return;
       }
-      this.book.meta.Pages.forEach((p, i) => p['i'] = i);
       this.ok.emit();
       this.title.setTitle(this.book.meta.Name);
 
@@ -72,7 +71,6 @@ export class ReaderComponent implements OnChanges {
       const setScale = i => {
         this.zone.run(() => {
           this.config.scale.set(barScaleMap.getB(i));
-          console.table(this.config.scale.get())
         });
       };
       // todo: pinch

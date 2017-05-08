@@ -2,6 +2,7 @@ import {BookMeta, PageMeta} from "./meta";
 import args from "../lib/args";
 import {Config} from "../config.service";
 import {ImageComponent} from "../image/image.component";
+import {get} from "../lib/get";
 const getSubBookNames = function (pms: PageMeta[]) {
   const m = new Map();
   pms.forEach(pm => m.set(pm.SubBook, 1));
@@ -37,9 +38,7 @@ export class Book {
 
   async init(): Promise<any> {
     await args.wait();
-    const url = new URL(`http://localhost:${args.port}/book`);
-    url['searchParams'].append('locator', this.locator);
-    const data = await fetch(url.href);
+    const data = await get(`http://localhost:${args.port}/book`, {locator: this.locator});
     this.meta = await data.json();
     if (!this.meta.Pages || !this.meta.Pages.length) {
       return 'no pages';

@@ -12,7 +12,7 @@ interface ViewMode {
   after: Function;
 }
 
-class ViewSinglePage implements ViewMode {
+export class ViewSinglePage implements ViewMode {
 
   is(view: any): boolean {
     return view === Config.VIEW_SINGLE_PAGE;
@@ -21,7 +21,7 @@ class ViewSinglePage implements ViewMode {
   private imgs: ImageComponent[];
   private manager: CacheManager;
 
-  bind(imgs: ImageComponent[], manager: CacheManager) {
+  constructor(imgs: ImageComponent[], manager: CacheManager) {
     this.imgs = imgs;
     this.manager = manager;
   }
@@ -42,7 +42,7 @@ class ViewSinglePage implements ViewMode {
   async check(page: number) {
     const cur = this.imgs[page - 1];
     await this.manager.request(page - 1);
-    if (this.last) {
+    if (this.last && this.last != cur) {
       this.last.hide();
     }
     cur.scrollTo();
@@ -56,7 +56,7 @@ class ViewSinglePage implements ViewMode {
   }
 }
 
-class ViewContinuousScroll implements ViewMode {
+export class ViewContinuousScroll implements ViewMode {
   is(view: any): boolean {
     return view === Config.VIEW_CONTINUOUS_SCROLL;
   }
@@ -64,7 +64,7 @@ class ViewContinuousScroll implements ViewMode {
   private imgs: ImageComponent[];
   private manager: CacheManager;
 
-  bind(imgs: ImageComponent[], manager: CacheManager) {
+  constructor(imgs: ImageComponent[], manager: CacheManager) {
     this.imgs = imgs;
     this.manager = manager;
   }
@@ -100,6 +100,3 @@ class ViewContinuousScroll implements ViewMode {
     clearInterval(this._timer);
   }
 }
-
-export const viewCS = new ViewContinuousScroll();
-export const viewSP = new ViewSinglePage();

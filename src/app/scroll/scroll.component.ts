@@ -3,7 +3,7 @@ import {Book} from "../reader/book";
 import {Config} from "../config.service";
 import {ImageComponent} from "../image/image.component";
 import {ABMap} from "../lib/util";
-import {viewCS, viewSP} from "./view-mode";
+import {ViewContinuousScroll, ViewSinglePage} from "./view-mode";
 import {CacheManager} from "./cache-manager";
 const {webFrame} = window['require']('electron');
 let checking: boolean = false;
@@ -30,8 +30,8 @@ export class ScrollComponent implements OnInit {
       // binding
       const imgs = this.imgs.map(img => img);
       const manager = new CacheManager(this.config, imgs);
-      viewCS.bind(imgs, manager);
-      viewSP.bind(imgs, manager);
+      const viewCS = new ViewContinuousScroll(imgs, manager);
+      const viewSP = new ViewSinglePage(imgs, manager);
       this.book.bind(imgs);
       // manager.debug();
 
