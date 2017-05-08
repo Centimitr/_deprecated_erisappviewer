@@ -22,31 +22,14 @@ export class ReaderComponent implements OnChanges {
   @Output() ok = new EventEmitter<null>();
   @Output() fail = new EventEmitter<any>();
   elm: HTMLElement;
-  private pageList = [];
-
-  // todo: multi-viewer: cache and better loading
-
-  @HostListener('window:contextmenu', ['$event']) onRightClick() {
-  }
 
   constructor(private zone: NgZone, private title: Title, private m: AppMenu, private s: AppStorage, elm: ElementRef, private config: Config) {
     this.elm = elm.nativeElement;
   }
 
-  update(page: number, leave?: boolean) {
-    if (leave) {
-      this.pageList = this.pageList.filter(p => p !== page);
-    }
-    else {
-      this.pageList.push(page);
-    }
-    this.book.updateCurrent(this.pageList[this.pageList.length - 1]);
-  }
-
   async ngOnChanges(changes) {
     if (changes.path && this.path) {
       this.config.clear();
-      console.log('CLEAR');
       this.book = new Book(this.path, this.config);
       let e = await this.book.init();
       if (e) {
@@ -57,10 +40,10 @@ export class ReaderComponent implements OnChanges {
       this.ok.emit();
       this.title.setTitle(this.book.meta.Name);
 
-      if (this.book.meta.Pages.length > 512) {
-        alert('Now manga with more than 256 pages is not supported, the first 256 pages are displayed.');
-        this.book.meta.Pages = this.book.meta.Pages.slice(0, 512);
-      }
+      // if (this.book.meta.Pages.length > 512) {
+      //   alert('Now manga with more than 512 pages is not supported, the first 512 pages are displayed.');
+      //   this.book.meta.Pages = this.book.meta.Pages.slice(0, 512);
+      // }
 
       // turn to specific page
       setTimeout(() => {
@@ -123,10 +106,9 @@ export class ReaderComponent implements OnChanges {
         click: () => setScale(i),
         checked: barScaleMap.getA(this.config.scale.get()) === i
       }));
-      // .concat([zoomInItem, zoomOutItem]);
-      const goItems = ['First Page', 'Go to..', 'Previous Page', 'Next Page'].map((label, i) => new MenuItem({
+      const goItems = ['First Page', 'Previous Page', 'Next Page'].map((label, i) => new MenuItem({
         label,
-        accelerator: [null, 'CmdOrCtrl+G', 'Left', 'Right'][i],
+        accelerator: [null, 'Left', 'Right'][i],
         click: () => {
           this.zone.run(() => {
             switch (i) {
@@ -134,22 +116,28 @@ export class ReaderComponent implements OnChanges {
                 this.book.go(1);
                 break;
               case 1:
-                const w = new BrowserWindow({
-                  modal: true, parent: getCurrentWindow()
-                });
-                w.show();
+                this.onContextMenu();
                 break;
               case 2:
-                this.book.prev();
-                break;
-              case 3:
-                this.book.next();
+                this.onClick();
                 break;
             }
           })
         }
       }));
       append(vm, viewItems, modeItems, goItems);
+      const cm = this.m.catalogue();
+      cm.clear();
+      const subBookItems = this.book.subBooks.map(name => new MenuItem({
+        label: name,
+        type: 'radio',
+        click: () => this.zone.run(() => this.book.setSubBook(name)),
+        checked: this.book.curSubBook === name
+      }));
+      append(cm, [new MenuItem({
+        label: subBookItems.length? 'subBooks inside': 'no subBook found',
+        enabled: false
+      })], subBookItems);
       this.m.set();
       // const setZoomItemEnabled = (min: number, max: number) => {
       //   const unit = this.config.ui.view.zoomUnit;
@@ -229,21 +217,6 @@ export class ReaderComponent implements OnChanges {
     }
   }
 
-  @HostListener('window:keydown.pageUp', ['$event']) prev() {
-    if (this.book) {
-      this.zone.run(() => {
-        this.book.prev();
-      });
-    }
-  };
-
-  @HostListener('window:keydown.pageDown', ['$event']) next() {
-    if (this.book) {
-      this.zone.run(() => {
-        this.book.next();
-      });
-    }
-  };
 
   // setScaleConstraint() {
   //   this.config.setScaleConstraint(this.book, this.elm, this.viewers);
@@ -256,11 +229,15 @@ export class ReaderComponent implements OnChanges {
   // }, 0);
   // }
 
+  @HostListener('window:keydown.pageDown', ['$event'])
   @HostListener('click', ['$event']) onClick() {
+    this.config.scrollDirection = true;
     this.book.next()
   }
 
+  @HostListener('window:keydown.pageUp', ['$event'])
   @HostListener('contextmenu', ['$event']) onContextMenu() {
+    this.config.scrollDirection = false;
     this.book.prev();
   }
 

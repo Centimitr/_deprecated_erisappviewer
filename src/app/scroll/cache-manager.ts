@@ -2,9 +2,9 @@ import {ImageComponent} from "../image/image.component";
 import {Config} from "../config.service";
 import {LatestRunner} from "../lib/util";
 
-const BACKWARD_RESERVE = 2;
-const FORWARD_RESERVE = 5;
-const NEXT_PRELOAD = 2;
+const BACKWARD_RESERVE = 3;
+const FORWARD_RESERVE = 6;
+const NEXT_PRELOAD = 3;
 
 class MinorQueue {
   private wait: Promise<void>;

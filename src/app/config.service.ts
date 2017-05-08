@@ -167,9 +167,9 @@ export class Config {
   //   }
   // }
   //
-  // isFullHeight(): boolean {
-  //   return this.mode.is(Config.MODE_FULL_HEIGHT);
-  // }
+  isMaxlHeight(): boolean {
+    return this.scale.is(Config.SCALE_MAXHEIGHT);
+  }
 
   // view
   view = new ConfigItem<number>(Config.VIEW_SINGLE_PAGE);

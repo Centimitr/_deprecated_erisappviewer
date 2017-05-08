@@ -17,8 +17,10 @@ const getTemplate = function () {
     {
       label: 'File',
       submenu: []
-    },
-    {
+    }, {
+      label: 'Catalogue',
+      submenu: []
+    }, {
       label: 'View',
       submenu: []
     },
@@ -80,7 +82,7 @@ const getTemplate = function () {
       ]
     });
     // Window menu.
-    template[3].submenu = [
+    template[4].submenu = [
       {
         label: 'Close',
         accelerator: 'CmdOrCtrl+W',
@@ -111,7 +113,7 @@ const getTemplate = function () {
       }
     ];
     if (1) {
-      template[3].submenu.push({
+      template[4].submenu.push({
         label: 'Developer Tools',
         accelerator: 'Cmd+Alt+I',
         role: 'toggledevtools'
@@ -143,8 +145,12 @@ export class AppMenu {
     return this.getSubMenu(1);
   }
 
-  view() {
+  catalogue() {
     return this.getSubMenu(2);
+  }
+
+  view() {
+    return this.getSubMenu(3);
   }
 
   set() {

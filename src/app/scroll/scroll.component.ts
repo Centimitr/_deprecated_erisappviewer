@@ -27,7 +27,6 @@ export class ScrollComponent implements OnInit {
     let check;
     const barViewMap = new ABMap(Config.VIEW_ALL);
     this.imgs.changes.subscribe(async (changes) => {
-
       // binding
       const imgs = this.imgs.map(img => img);
       const manager = new CacheManager(this.config, imgs);

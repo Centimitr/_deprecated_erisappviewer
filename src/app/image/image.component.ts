@@ -76,14 +76,18 @@ export class ImageComponent implements OnInit {
 
   resize() {
     if (!this.canvas) return;
-    const container = this.elm.parentNode.parentNode;
-    const mode: Scale = this.config.scale.get();
-    let s = mode.calc({
-      w: container.offsetWidth,
-      h: container.offsetHeight
-    }, this.size);
-    this.canvas.style.zoom = s;
-    this.setHeight(this.size.h * s)
+    try {
+      const p = this.elm.parentNode.parentNode;
+      const mode: Scale = this.config.scale.get();
+      let s = mode.calc({
+        w: p.offsetWidth,
+        h: p.offsetHeight
+      }, this.size);
+      this.canvas.style.zoom = s;
+      this.setHeight(this.size.h * s)
+    } catch (e) {
+      // this catch is because when submenu changing, parentNode may be null
+    }
   }
 
   clear() {

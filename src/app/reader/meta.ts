@@ -1,5 +1,6 @@
 export class PageMeta {
   Locator: string;
+  SubBook: string;
   Name: string;
   Width: number;
   Height: number;

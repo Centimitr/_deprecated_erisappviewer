@@ -1,7 +1,8 @@
-<div style="height: 5vh; width: 100%;"></div>
-<cm-image *ngFor="let p of book?.meta?.Pages; let i=index;"
-          style="margin-bottom: 5vh"
+<div [hidden]="config.isSinglePage()&&config.isMaxlHeight()"
+     style="height: 5vh; width: 100%;"></div>
+<cm-image *ngFor="let p of book?.pages(); let i=index;"
+          [style.marginBottom.vh]="config.isSinglePage()&&config.isMaxlHeight()?0:5"
           [page]="i+1"
           [src]="book.getPageFilePath(p.Locator)"
 ></cm-image>
-<div style="height: 0vh; width: 100%;"></div>
+<div style="height: 0; width: 100%;"></div>

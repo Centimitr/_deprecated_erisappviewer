@@ -1,7 +1,12 @@
-import {BookMeta} from "./meta";
+import {BookMeta, PageMeta} from "./meta";
 import args from "../lib/args";
 import {Config} from "../config.service";
 import {ImageComponent} from "../image/image.component";
+const getSubBookNames = function (pms: PageMeta[]) {
+  const m = new Map();
+  pms.forEach(pm => m.set(pm.SubBook, 1));
+  return Array.from(m.keys()).sort((a, b) => a.length - b.length);
+};
 
 export class Book {
   locator: string;
@@ -27,17 +32,30 @@ export class Book {
     }
   }
 
+  subBooks: string[];
+  curSubBook: string;
+
   async init(): Promise<any> {
     await args.wait();
-    const url = new URL(`https://localhost:${args.port}/book`);
+    const url = new URL(`http://localhost:${args.port}/book`);
     url['searchParams'].append('locator', this.locator);
     const data = await fetch(url.href);
     this.meta = await data.json();
     if (!this.meta.Pages || !this.meta.Pages.length) {
       return 'no pages';
     }
-    this.total = this.meta.Pages.length;
+    this.subBooks = getSubBookNames(this.meta.Pages);
+    this.setSubBook(this.subBooks[0]);
+  }
+
+  setSubBook(name: string) {
+    this.curSubBook = name;
     this.current = 1;
+    this.total = this.pages().length;
+  }
+
+  pages() {
+    return this.meta && this.meta.Pages ? this.meta.Pages.filter(pm => pm.SubBook === this.curSubBook) : [];
   }
 
   private checkPage(page: number) {
@@ -67,8 +85,8 @@ export class Book {
     if (ok) {
       if (this.config.isSinglePage()) {
         this.current = page;
-      }else if (this.config.isContinuousScroll()){
-        const img = this.imgs[page-1];
+      } else if (this.config.isContinuousScroll()) {
+        const img = this.imgs[page - 1];
         img.scrollTo();
       }
     }
@@ -84,7 +102,7 @@ export class Book {
   }
 
   getPageFilePath(imgLocator: string) {
-    const url = new URL(`https://localhost:${args.port}/book/page`);
+    const url = new URL(`http://localhost:${args.port}/book/page`);
     url['searchParams'].append('locator', this.locator);
     url['searchParams'].append('page', imgLocator);
     return url.href;

@@ -70,12 +70,13 @@ class ViewContinuousScroll implements ViewMode {
   }
 
   onPage: any;
+  private _timer: any;
 
   before(config: Config, book: Book) {
     this.imgs.forEach(img => img.show());
     this.imgs[book.current - 1].scrollTo();
     const r = new LatestRunner();
-    setInterval(() => {
+    this._timer = setInterval(() => {
       const r = this.imgs.map((img, i) => ({i: i, r: img.ratio()})).filter(x => x.r > 0.45);
       const d = config.scrollDirection;
       const focus = d ? r.pop() : r.shift();
@@ -96,6 +97,7 @@ class ViewContinuousScroll implements ViewMode {
 
   after(book: Book) {
     book.onPageRemove(this.onPage);
+    clearInterval(this._timer);
   }
 }
 
