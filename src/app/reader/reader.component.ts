@@ -56,10 +56,10 @@ export class ReaderComponent implements OnChanges {
               cancelId: 1
             }) === 0;
           if (shouldTurn) {
-            this.book.go(page);
+            this.zone.run(() => this.book.go(page));
           }
         }
-      });
+      }, 0);
       // scale and view
       const barViewMap = new ABMap(Config.VIEW_ALL);
       const barScaleMap = new ABMap(Config.SCALE_ALL);
@@ -133,7 +133,7 @@ export class ReaderComponent implements OnChanges {
         checked: this.book.curSubBook === name
       }));
       append(cm, [new MenuItem({
-        label: subBookItems.length? 'subBooks inside': 'no subBook found',
+        label: subBookItems.length ? 'subBooks inside' : 'no subBook found',
         enabled: false
       })], subBookItems);
       this.m.set();
@@ -189,7 +189,7 @@ export class ReaderComponent implements OnChanges {
           slider.label = getProgressStr(current);
         })
       });
-      this.book.onSubBook(()=>{
+      this.book.onSubBook(() => {
         slider.maxValue = this.book.total;
         slider.label = getProgressStr(this.book.current);
       });

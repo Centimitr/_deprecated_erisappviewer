@@ -11,7 +11,7 @@ interface ViewMode {
   check: Function;
   after: Function;
 }
-
+const r = new LatestRunner();
 export class ViewSinglePage implements ViewMode {
 
   is(view: any): boolean {
@@ -30,9 +30,8 @@ export class ViewSinglePage implements ViewMode {
 
   before(book: Book) {
     this.imgs.filter((img, i) => i !== book.current - 1).forEach(img => img.hide());
-    const r = new LatestRunner();
     this.onPage = (n: number) => {
-      r.run(() => this.check(n))
+      this.check(n)
     };
     book.onPage(this.onPage);
   }
@@ -40,14 +39,17 @@ export class ViewSinglePage implements ViewMode {
   private last: ImageComponent;
 
   async check(page: number) {
-    const cur = this.imgs[page - 1];
-    await this.manager.request(page - 1);
-    if (this.last && this.last != cur) {
-      this.last.hide();
-    }
-    cur.scrollTo();
-    cur.show();
-    this.last = cur;
+    await r.run(async () => {
+      const cur = this.imgs[page - 1];
+      await this.manager.request(page - 1);
+      if (this.last && this.last != cur) {
+        this.last.hide();
+      }
+      cur.scrollTo();
+      cur.show();
+      this.last = cur;
+    });
+
   }
 
   after(book: Book) {
@@ -85,14 +87,19 @@ export class ViewContinuousScroll implements ViewMode {
       }
     }, 300);
     this.onPage = (n: number) => {
-      r.run(() => this.check())
+      this.check();
     };
     book.onPage(this.onPage);
   }
 
   async check() {
-    const showingIndex = this.imgs.map((img, i) => ({i: i, inView: img.inView()})).filter(x => x.inView).map(x => x.i);
-    await this.manager.request(...showingIndex);
+    await r.run(async () => {
+      const showingIndex = this.imgs.map((img, i) => ({
+        i: i,
+        inView: img.inView()
+      })).filter(x => x.inView).map(x => x.i);
+      await this.manager.request(...showingIndex);
+    });
   }
 
   after(book: Book) {

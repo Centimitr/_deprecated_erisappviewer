@@ -21,6 +21,16 @@ export class Args {
   wait() {
     return this._promise;
   }
+
+  private _onPath: Function[] = [];
+
+  onPath(fn: Function) {
+    this._onPath.push(fn);
+  }
+
+  execOnPath() {
+    this._onPath.forEach(fn => fn(this.path))
+  }
 }
 
 const args: Args = new Args();
@@ -28,6 +38,7 @@ const args: Args = new Args();
 ipcRenderer.on('path', (event, message) => {
   console.warn('PATH:', message);
   args.path = message;
+  args.execOnPath();
   args.sema++;
   args.check();
 });

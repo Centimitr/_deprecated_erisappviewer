@@ -26,12 +26,15 @@ export class ScrollComponent implements OnInit {
   ngAfterViewInit() {
     let check;
     const barViewMap = new ABMap(Config.VIEW_ALL);
+    let viewCS: ViewContinuousScroll, viewSP: ViewSinglePage;
     this.imgs.changes.subscribe(async (changes) => {
       // binding
       const imgs = this.imgs.map(img => img);
       const manager = new CacheManager(this.config, imgs);
-      const viewCS = new ViewContinuousScroll(imgs, manager);
-      const viewSP = new ViewSinglePage(imgs, manager);
+      if (viewSP) viewSP.after(this.book);
+      if (viewCS) viewCS.after(this.book);
+      viewCS = new ViewContinuousScroll(imgs, manager);
+      viewSP = new ViewSinglePage(imgs, manager);
       this.book.bind(imgs);
       // manager.debug();
 

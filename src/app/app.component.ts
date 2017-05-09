@@ -7,6 +7,7 @@ const electron = window['require']('electron');
 const {webFrame} = electron;
 const {dialog, getCurrentWindow} = electron.remote;
 const ses = getCurrentWindow().webContents.session;
+const getSize = () => new Promise<number>(resolve => ses.getCacheSize(size => resolve(size)));
 
 @Component({
   selector: 'app-root',
@@ -30,7 +31,7 @@ export class AppComponent implements OnInit {
     webFrame.setVisualZoomLevelLimits(1, 1);
     webFrame.setLayoutZoomLevelLimits(0, 0);
 
-    ses.on('will-download', (event, item, webContents) => {
+    ses.on('will-download', (event) => {
       event.preventDefault();
     });
 
@@ -81,12 +82,6 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const getSize = () => new Promise<number>(resolve => ses.getCacheSize(size => resolve(size)));
-    // setInterval(async () => {
-    //   const s = await getSize();
-    //   console.log(s / 1024 / 1024, 'MB');
-    // }, 1000);
-    // console.log(s / 1024 / 1024, 'MB');
 
     await args.wait();
     const path = args.path;
@@ -96,14 +91,29 @@ export class AppComponent implements OnInit {
       this.path = path;
       await this.whenOpen();
     }
+    args.onPath(path => {
+      const shouldOpen = dialog.showMessageBox(getCurrentWindow(), {
+          type: 'question',
+          message: `File Open Request`,
+          detail: `Would you like to open '${path}'?`,
+          buttons: ['Yes', 'Cancel'],
+          cancelId: 1
+        }) === 0;
+      if (shouldOpen) {
+        this.zone.run(async () => {
+          this.path = path;
+          await this.whenOpen();
+        });
+      }
+    })
   }
 
   onOk() {
     getCurrentWindow().show();
   }
 
-  async open(e?:any) {
-    if(e){
+  async open(e?: any) {
+    if (e) {
       alert(e);
     }
     try {
