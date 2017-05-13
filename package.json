@@ -23,15 +23,9 @@
     "@angular/platform-browser-dynamic": "^4.0.0",
     "@angular/platform-server": "^4.0.0",
     "@angular/router": "^4.0.0",
-    "@fknop/node-unrar": "^1.1.0",
-    "bluebird": "^3.5.0",
     "core-js": "^2.4.1",
-    "decompress": "^4.0.0",
-    "fs-p": "^2.0.0",
     "rxjs": "^5.1.0",
     "typescript": "^2.3.2",
-    "unzip": "^0.1.11",
-    "uuid": "^3.0.1",
     "zone.js": "^0.7.6"
   },
   "devDependencies": {

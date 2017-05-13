@@ -162,7 +162,7 @@ export class ReaderComponent implements OnChanges {
             barProgLastValue = current;
             slider.label = getProgressStr(current);
             this.zone.run(() => this.book.go(current));
-            // lock.lock(250);
+            lock.lock(250);
           }
         }
       });

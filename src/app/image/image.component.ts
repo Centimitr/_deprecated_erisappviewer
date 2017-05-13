@@ -132,9 +132,13 @@ export class ImageComponent implements OnInit {
   }
 
   distance(): number {
-    const min = this.elm.offsetTop - this.elm.offsetParent.clientHeight;
-    const max = this.elm.offsetTop + this.elm.offsetHeight;
-    return new Range(min, max).distance(this.elm.offsetParent.scrollTop);
+    try {
+      const min = this.elm.offsetTop - this.elm.offsetParent.clientHeight;
+      const max = this.elm.offsetTop + this.elm.offsetHeight;
+      return new Range(min, max).distance(this.elm.offsetParent.scrollTop);
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   ratio(): number {

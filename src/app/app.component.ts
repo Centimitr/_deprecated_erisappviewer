@@ -54,12 +54,14 @@ export class AppComponent implements OnInit {
     fm.append(new MenuItem({
       label: 'Open URL...',
       accelerator: 'CmdOrCtrl+U',
+      visible: false,
       enabled: false,
       click: () => this.zone.run(() => this.open())
     }));
     fm.append(new MenuItem({
       label: 'Save As...',
       enabled: false,
+      visible: false,
       accelerator: 'CmdOrCtrl+Shift+S',
       click(){
         console.log('SAVE AS.');
