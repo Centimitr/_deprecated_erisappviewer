@@ -39,9 +39,12 @@ export class ViewSinglePage implements ViewMode {
   private last: ImageComponent;
 
   async check(page: number) {
+    console.log(1, page);
     await r.run(async () => {
       const cur = this.imgs[page - 1];
+      console.log(2, page);
       await this.manager.request(page - 1);
+      console.log(3, page);
       if (this.last && this.last != cur) {
         this.last.hide();
       }

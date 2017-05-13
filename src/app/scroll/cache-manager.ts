@@ -59,15 +59,15 @@ export class CacheManager {
   latest = new LatestRunner();
 
   async request(...indexes: number[]) {
-    await this.latest.run(async () => {
-      await this.minor.stop();
-      for (let i = 0; i < indexes.length; i++) {
-        await this.imgs[indexes[i]].paint();
-      }
-      let tasks = [];
-      tasks = tasks.concat(this.getPreloadTasks(indexes), this.getCleanTasks(indexes));
-      this.minor.run(tasks);
-    });
+    // await this.latest.run(async () => {
+    await this.minor.stop();
+    for (let i = 0; i < indexes.length; i++) {
+      await this.imgs[indexes[i]].paint();
+    }
+    let tasks = [];
+    tasks = tasks.concat(this.getPreloadTasks(indexes), this.getCleanTasks(indexes));
+    this.minor.run(tasks);
+    // });
   }
 
   debug() {
