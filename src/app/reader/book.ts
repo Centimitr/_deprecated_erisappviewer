@@ -21,7 +21,6 @@ export class Book {
     this.locator = path;
   }
 
-
   get current(): number {
     return this._current;
   }
@@ -43,7 +42,7 @@ export class Book {
     const data = await get(`http://localhost:${args.port}/book`, {locator: this.locator});
     this.meta = await data.json();
     if (!this.meta.Pages || !this.meta.Pages.length) {
-      return 'no pages';
+      return 'Sorry, no book found in this folder.';
     }
     this.subBooks = getSubBookNames(this.meta.Pages);
     this.setSubBook(this.subBooks[0]);
@@ -123,6 +122,18 @@ export class Book {
     this._onPage = this._onPage.filter(cb => cb !== callback);
   }
 
+  // interface
+  pHasPageLoaded: Function;
+
+  hasPageLoaded(): Promise<void> {
+    return new Promise<void>(resolve => this.pHasPageLoaded = resolve);
+  }
+
+  ensureHasPageLoaded() {
+    if (this.pHasPageLoaded) this.pHasPageLoaded();
+  }
+
+  // last read
   getLastReadIndex() {
     return this.meta.Pages.map(pm => pm.Locator).indexOf(this.meta.LastRead);
   }

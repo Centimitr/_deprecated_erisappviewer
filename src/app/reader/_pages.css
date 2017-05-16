@@ -10,11 +10,14 @@ section.pages {
   overflow-y: scroll;
   overflow-scrolling: touch;
   scroll-behavior: smooth;
+  opacity: 1;
+  transition: 50ms;
+}
+
+section.pages.hide {
+  opacity: 0;
 }
 
 viewer {
   width: 100%;
 }
-
-
-

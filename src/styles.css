@@ -10,6 +10,27 @@
   cursor: default;
 }
 
+body {
+  transition: 375ms;
+}
+
+/*body.bg-tran-d-l {*/
+  /*background-color: #dedede;*/
+  /*animation: bg-tran 375ms;*/
+/*}*/
+/**/
+/*@keyframes bg-tran {*/
+  /*0% {*/
+    /*opacity: 0;*/
+  /*}*/
+  /*62% {*/
+    /*opacity: 1;*/
+  /*}*/
+  /*100% {*/
+    /*opacity: 0*/
+  /*}*/
+/*}*/
+
 canvas {
   /*animation: canvas-enter 75ms ease-in;*/
 }

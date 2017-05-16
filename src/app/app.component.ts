@@ -5,7 +5,7 @@ import {AppStorage, AppStorageValue, KeyValue} from "./lib/storage";
 import {Title} from "@angular/platform-browser";
 const electron = window['require']('electron');
 const {webFrame} = electron;
-const {dialog, getCurrentWindow} = electron.remote;
+const {dialog, getCurrentWindow, app} = electron.remote;
 const ses = getCurrentWindow().webContents.session;
 const getSize = () => new Promise<number>(resolve => ses.getCacheSize(size => resolve(size)));
 
@@ -21,15 +21,13 @@ export class AppComponent implements OnInit {
   titleBarContextMenu: any;
 
   constructor(private zone: NgZone, private title: Title, private m: AppMenu, private s: AppStorage) {
+    webFrame.setZoomLevelLimits(1, 1);
     this.win = getCurrentWindow();
     const menu = new Menu();
     const aotItem = new MenuItem(alwaysOnTopItem);
     menu.append(aotItem);
     menu.refreshAOTChecked = () => aotItem.checked = this.win.isAlwaysOnTop();
     this.titleBarContextMenu = menu;
-
-    webFrame.setVisualZoomLevelLimits(1, 1);
-    webFrame.setLayoutZoomLevelLimits(0, 0);
 
     ses.on('will-download', (event) => {
       event.preventDefault();
@@ -116,7 +114,10 @@ export class AppComponent implements OnInit {
 
   async open(e?: any) {
     if (e) {
-      alert(e);
+      dialog.showMessageBox(this.win.isVisible() ? this.win : null, {
+        type: 'warning',
+        message: e
+      })
     }
     try {
       this.path = dialog.showOpenDialog({
@@ -127,10 +128,10 @@ export class AppComponent implements OnInit {
           {name: 'Archive', extensions: ['rar', 'zip']},
         ]
       }).pop();
+      this.refresh++;
       await this.whenOpen();
     } catch (e) {
     }
-    // this.refresh++;
   }
 
   getTitle() {

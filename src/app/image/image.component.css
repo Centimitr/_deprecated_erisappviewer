@@ -17,12 +17,16 @@
   justify-content: center;
   /*color: white;*/
   font-family: "American Typewriter", monospace;
-  opacity: 0.8;
+  opacity: 0.62;
+  transition: opacity 275ms ease-in;
 }
 
 .loading.hide {
   opacity: 0;
-  transition: opacity 275ms ease-in;
+}
+
+.loading.singlePage {
+  position: fixed;
 }
 
 .loading .words {

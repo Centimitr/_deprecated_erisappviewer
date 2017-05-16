@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 const electron = window['require']('electron');
-const {app, Menu, MenuItem} = electron.remote;
+const {app, Menu, MenuItem, BrowserWindow} = electron.remote;
 const process = window['process'];
 
 const alwaysOnTopItem = {
@@ -41,7 +41,17 @@ const getTemplate = function () {
         {
           label: 'Learn More',
           click () {
-            electron.shell.openExternal('http://devbycm.com')
+            electron.shell.openExternal('http://erisapp.com');
+          }
+        }, {
+          label: 'Credits',
+          click(){
+            electron.shell.openExternal('http://erisapp.com/credits');
+          }
+        }, {
+          label: 'Feedback',
+          click(){
+            electron.shell.openExternal('http://erisapp.com/feedback');
           }
         }
       ]
@@ -53,8 +63,7 @@ const getTemplate = function () {
       submenu: [
         {
           role: 'about'
-        },
-        {
+        }, {
           type: 'separator'
         },
         {
@@ -93,9 +102,9 @@ const getTemplate = function () {
         accelerator: 'CmdOrCtrl+M',
         role: 'minimize'
       }, {
-        role: 'togglefullscreen'
-      }, {
         type: 'separator'
+      }, {
+        role: 'togglefullscreen'
       }, {
         label: 'Zoom',
         accelerator: 'Ctrl+Cmd+=',
@@ -106,6 +115,43 @@ const getTemplate = function () {
           win.center();
         }
       }, alwaysOnTopItem, {
+        type: 'separator'
+      }, {
+        label: 'Background',
+        enabled: false
+      }, {
+        label: 'Light',
+        type: 'radio',
+        click(item, win){
+          document.body.style.backgroundColor = null;
+          win.setVibrancy('light');
+        }
+      }, {
+        label: 'Dark',
+        type: 'radio',
+        click(item, win){
+          win.setVibrancy('medium-light');
+          document.body.style.backgroundColor = 'rgba(0,0,0,.7)';
+        }
+      }, {
+        label: 'Book Paper',
+        type: 'radio',
+        click(){
+          document.body.style.backgroundColor = '#f8f4ea';
+        }
+      }, {
+        label: 'Silver Gray',
+        type: 'radio',
+        click(){
+          document.body.style.backgroundColor = '#dedede';
+        }
+      }, {
+        label: 'Deep Black',
+        type: 'radio',
+        click(){
+          document.body.style.backgroundColor = '#171717';
+        }
+      }, {
         type: 'separator'
       }, {
         label: 'Bring All to Front',

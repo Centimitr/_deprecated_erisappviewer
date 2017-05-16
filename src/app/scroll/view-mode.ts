@@ -39,12 +39,12 @@ export class ViewSinglePage implements ViewMode {
   private last: ImageComponent;
 
   async check(page: number) {
-    console.log(1, page);
+    // console.log(1, page);
     await r.run(async () => {
       const cur = this.imgs[page - 1];
-      console.log(2, page);
+      // console.log(2, page);
       await this.manager.request(page - 1);
-      console.log(3, page);
+      // console.log(3, page);
       if (this.last && this.last != cur) {
         this.last.hide();
       }
@@ -56,7 +56,7 @@ export class ViewSinglePage implements ViewMode {
   }
 
   after(book: Book) {
-    book.onPageRemove(this.onPage);
+    if (book) book.onPageRemove(this.onPage);
     this.last = null;
   }
 }
@@ -106,7 +106,7 @@ export class ViewContinuousScroll implements ViewMode {
   }
 
   after(book: Book) {
-    book.onPageRemove(this.onPage);
+    if (book) book.onPageRemove(this.onPage);
     clearInterval(this._timer);
   }
 }

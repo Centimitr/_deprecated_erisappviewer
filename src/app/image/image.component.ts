@@ -32,6 +32,7 @@ export class ImageComponent implements OnInit {
   @Input() src: string;
   @Input() page: number;
   elm: any;
+  loading: any;
 
   constructor(elm: ElementRef, private config: Config) {
     this.elm = elm.nativeElement;
@@ -40,6 +41,7 @@ export class ImageComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.loading = this.elm.querySelector('.loading');
   }
 
   canvas: any;
@@ -50,15 +52,19 @@ export class ImageComponent implements OnInit {
   private _height: number;
 
   private async cache() {
-    this.reject = false;
-    if (!this.canvas) {
-      let ib = await fetch(this.src);
-      if (this.reject) {
-        return
+    try {
+      this.reject = false;
+      if (!this.canvas) {
+        let ib = await fetch(this.src);
+        if (this.reject) {
+          return
+        }
+        this.canvas = bitmapToCanvas(ib);
+        ib = null;
+        this.size = {w: this.canvas.width, h: this.canvas.height};
       }
-      this.canvas = bitmapToCanvas(ib);
-      ib = null;
-      this.size = {w: this.canvas.width, h: this.canvas.height};
+    } catch (e) {
+      console.error(e)
     }
   }
 
@@ -71,6 +77,7 @@ export class ImageComponent implements OnInit {
       this.elm.appendChild(this.canvas);
       this.canvas.style.boxShadow = '0 0 12px 4px rgba(0,0,0,.382)';
       this.showing = true;
+      this.loading.classList.add('hide');
       this.showLock = false;
     }
   }
@@ -116,6 +123,7 @@ export class ImageComponent implements OnInit {
       const parent = this.canvas.parentNode;
       if (parent) parent.removeChild(this.canvas);
       this.showing = false;
+      this.loading.classList.remove('hide');
       this.canvas = null;
     }
   }

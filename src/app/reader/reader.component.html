@@ -1,4 +1,4 @@
-<section class="pages" #pages>
+<section class="pages" #pages [class.hide]="loadingShow">
   <cm-scroll style="width: 100%;" [book]="book"></cm-scroll>
 </section>
 <section class="layer">
@@ -6,5 +6,8 @@
     <span>{{book?.current}}</span>
     <span style="opacity: 0.8;margin: 0 -2px;">/</span>
     <span style="opacity: 0.95">{{book?.total}}</span>
+  </section>
+  <section class="loading" [class.show]="loadingShow">
+    <cm-dot class="word" [word]="'Book Loading'" [interval]="500"></cm-dot>
   </section>
 </section>

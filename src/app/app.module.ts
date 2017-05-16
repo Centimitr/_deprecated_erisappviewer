@@ -11,6 +11,7 @@ import {AppStorage} from "./lib/storage";
 import {ImageComponent} from "./image/image.component";
 import {ScrollComponent} from "./scroll/scroll.component";
 import {Config} from "./config.service";
+import { DotComponent } from './dot/dot.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import {Config} from "./config.service";
     TrustResourceUrlPipe,
     ImageComponent,
     ScrollComponent,
+    DotComponent,
   ],
   imports: [
     BrowserModule,

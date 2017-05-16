@@ -6,6 +6,7 @@ import {Config} from "../config.service";
 import {AppMenu} from "../lib/menu";
 import {Title} from "@angular/platform-browser";
 import {AppStorage} from "app/lib/storage";
+import {time} from "../lib/time";
 const fs = window['require']('fs');
 const {dialog, BrowserWindow, getCurrentWindow, Menu, MenuItem} = window['require']('electron').remote;
 
@@ -22,14 +23,18 @@ export class ReaderComponent implements OnChanges {
   @Output() ok = new EventEmitter<null>();
   @Output() fail = new EventEmitter<any>();
   elm: HTMLElement;
+  loadingShow: boolean = false;
 
   constructor(private zone: NgZone, private title: Title, private m: AppMenu, private s: AppStorage, elm: ElementRef, private config: Config) {
     this.elm = elm.nativeElement;
   }
 
   async ngOnChanges(changes) {
-    if (changes.path && this.path) {
+    if ((changes.path || changes.refresh) && this.path) {
       this.config.clear();
+      this.book = null;
+      this.loadingShow = true;
+      await time.Sleep(1000);
       this.book = new Book(this.path, this.config);
       let e = await this.book.init();
       if (e) {
@@ -37,6 +42,8 @@ export class ReaderComponent implements OnChanges {
         return;
       }
       this.ok.emit();
+      await this.book.hasPageLoaded();
+      this.loadingShow = false;
       this.title.setTitle(this.book.meta.Name);
 
       // if (this.book.meta.Pages.length > 512) {
@@ -127,15 +134,16 @@ export class ReaderComponent implements OnChanges {
       const cm = this.m.catalogue();
       cm.clear();
       const subBookItems = this.book.subBooks.map(name => new MenuItem({
-        label: name,
+        label: '.'.includes(name) ? 'Default Book' : name,
         type: 'radio',
         click: () => this.zone.run(() => this.book.setSubBook(name)),
         checked: this.book.curSubBook === name
       }));
+
       append(cm, [new MenuItem({
-        label: subBookItems.length ? 'subBooks inside' : 'no subBook found',
+        label: subBookItems.length > 1 ? 'multi-books inside' : 'no sub-book found',
         enabled: false
-      })], subBookItems);
+      })], subBookItems.length > 1 ? subBookItems : []);
       this.m.set();
       // const setZoomItemEnabled = (min: number, max: number) => {
       //   const unit = this.config.ui.view.zoomUnit;
@@ -242,13 +250,14 @@ export class ReaderComponent implements OnChanges {
     this.book.prev();
   }
 
-  @HostListener('window:mousewheel', ['$event'])
-  async onWheel(e) {
-    // e.preventDefault();
-    // requestAnimationFrame(() => {
-    // if (e.ctrlKey) this.config.pinch.set(Math.exp(-e.deltaY / 100));
-    // else this.elm.firstElementChild.scrollTop += e.deltaY * (this.config.natureScroll ? 1 : -1);
-    // });
+  @HostListener('window:mousewheel', ['$event']) onWheel(e) {
+    if (e.ctrlKey) {
+      e.preventDefault();
+      if (this.config.scale.is(Config.SCALE_DEFAULT)) {
+        this.config.pinch.set(Math.exp(-e.deltaY / 100));
+      }
+      return;
+    }
     this.config.scrollDirection = e.deltaY > 0;
   }
 }

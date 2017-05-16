@@ -16,8 +16,10 @@ let checking: boolean = false;
 export class ScrollComponent implements OnInit {
   @Input() book: Book;
   @ViewChildren(ImageComponent) imgs: QueryList<ImageComponent>;
+  private elm: HTMLElement;
 
   constructor(private config: Config, elm: ElementRef) {
+    this.elm = elm.nativeElement;
   }
 
   ngOnInit() {
@@ -30,11 +32,12 @@ export class ScrollComponent implements OnInit {
     this.imgs.changes.subscribe(async (changes) => {
       // binding
       const imgs = this.imgs.map(img => img);
-      const manager = new CacheManager(this.config, imgs);
+      const manager = new CacheManager(this.config, this.book, imgs);
       if (viewSP) viewSP.after(this.book);
       if (viewCS) viewCS.after(this.book);
       viewCS = new ViewContinuousScroll(imgs, manager);
       viewSP = new ViewSinglePage(imgs, manager);
+      if (!this.book) return;
       this.book.bind(imgs);
       // manager.debug();
 
@@ -65,5 +68,4 @@ export class ScrollComponent implements OnInit {
   @HostListener('window:resize') onResize() {
     this.imgs.map(img => img).filter(img => img.showing).forEach(img => img.resize())
   }
-
 }

@@ -1,6 +1,7 @@
 import {ImageComponent} from "../image/image.component";
 import {Config} from "../config.service";
 import {LatestRunner} from "../lib/util";
+import {Book} from "../reader/book";
 
 const BACKWARD_RESERVE = 3;
 const FORWARD_RESERVE = 6;
@@ -37,7 +38,7 @@ export class CacheManager {
   // showQ: ImageComponent[];
   // cacheQ: ImageComponent[];
 
-  constructor(private config: Config, private imgs: ImageComponent[]) {
+  constructor(private config: Config, private book: Book, private imgs: ImageComponent[]) {
   }
 
   private getPreloadTasks(indexes: number[]): Promise<any>[] {
@@ -63,6 +64,7 @@ export class CacheManager {
     await this.minor.stop();
     for (let i = 0; i < indexes.length; i++) {
       await this.imgs[indexes[i]].paint();
+      this.book.ensureHasPageLoaded();
     }
     let tasks = [];
     tasks = tasks.concat(this.getPreloadTasks(indexes), this.getCleanTasks(indexes));

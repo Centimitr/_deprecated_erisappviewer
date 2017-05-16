@@ -157,7 +157,7 @@ export class LatestRunner {
       }
       this.busy = false;
     } else {
-      console.log('busy so wait');
+      // console.log('busy so wait');
       this.wait = fn;
     }
   }

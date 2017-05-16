@@ -93,7 +93,6 @@ export class ConfigRangedItem extends ConfigItem<number> {
 export class Config {
 
   recentlyEnjoyedLen: number = 10;
-  natureScroll: boolean = true;
   scrollDirection: boolean = true;
 
   // appearance
@@ -112,7 +111,6 @@ export class Config {
   }
 
   pinch = new ConfigItem<number>(1);
-
 
   // scale
   static SCALE_DEFAULT = new Scale(null, 100, null, 150);
@@ -188,7 +186,7 @@ export class Config {
   }
 
   isSinglePage(): boolean {
-    return this.view.get() === Config.VIEW_SINGLE_PAGE;
+    return this.view.is(Config.VIEW_SINGLE_PAGE);
   }
 
   // mixed

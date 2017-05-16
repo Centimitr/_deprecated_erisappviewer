@@ -1,4 +1,4 @@
-<div class="loading">
+<div class="loading" [class.singlePage]="config.isSinglePage()">
   <div class="words">
     <div class="page">Page {{page}}</div>
     <div class="status">loading...</div>
