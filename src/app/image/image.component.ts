@@ -76,6 +76,7 @@ export class ImageComponent implements OnInit {
       this.resize(false);
       this.elm.appendChild(this.canvas);
       this.canvas.style.boxShadow = '0 0 12px 4px rgba(0,0,0,.382)';
+      this.canvas.style.border = '1px solid rgba(0,0,0,.382)';
       this.showing = true;
       this.loading.classList.add('hide');
       this.showLock = false;

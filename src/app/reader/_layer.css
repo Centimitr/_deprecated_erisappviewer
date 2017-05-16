@@ -44,10 +44,10 @@
   justify-content: center;
   align-items: center;
   opacity: 0;
-  transition: opacity 500ms;
+  transition: 275ms;
 }
 
-.show {
+.loading.show {
   opacity: 1;
 }
 
