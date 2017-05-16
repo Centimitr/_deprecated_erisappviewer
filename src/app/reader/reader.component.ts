@@ -1,6 +1,6 @@
 import {Component, ElementRef, EventEmitter, HostListener, Input, NgZone, OnChanges, Output} from "@angular/core";
 import {setTouchBar, TouchBarSegmentedControl, TouchBarSlider} from "../lib/touchbar";
-import {ABMap, LRU, RustyLock} from "../lib/util";
+import {ABMap, LRU, RustyLock, Timeout} from "../lib/util";
 import {Book} from "./book";
 import {Config} from "../config.service";
 import {AppMenu} from "../lib/menu";
@@ -34,7 +34,7 @@ export class ReaderComponent implements OnChanges {
       this.config.clear();
       this.book = null;
       this.loadingShow = true;
-      await time.Sleep(1000);
+      const t = new Timeout();
       this.book = new Book(this.path, this.config);
       let e = await this.book.init();
       if (e) {
@@ -43,6 +43,7 @@ export class ReaderComponent implements OnChanges {
       }
       this.ok.emit();
       await this.book.hasPageLoaded();
+      await t.timeout(998);
       this.loadingShow = false;
       this.title.setTitle(this.book.meta.Name);
 

@@ -1,4 +1,5 @@
 import Timer = NodeJS.Timer;
+import {time} from "./time";
 
 export class RustyLock {
   finishTime: number = 0;
@@ -165,5 +166,25 @@ export class LatestRunner {
   async runp(p: Promise<any>) {
     const fn = () => p;
     await this.run(fn);
+  }
+}
+
+export class Timeout {
+  t: number;
+
+  constructor() {
+    this.t = time.Now();
+  }
+
+  timeout(delay: number): Promise<void> {
+    return new Promise<void>(resolve => {
+      const since = time.Since(this.t);
+      const d = since > delay ? 0 : delay - since;
+      console.log(since, d);
+      setTimeout(() => {
+        console.log('1');
+        resolve();
+      }, d)
+    });
   }
 }
