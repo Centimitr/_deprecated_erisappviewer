@@ -242,13 +242,15 @@ export class ReaderComponent implements OnChanges {
   @HostListener('window:keydown.pageDown', ['$event'])
   @HostListener('click', ['$event']) onClick() {
     this.config.scrollDirection = true;
-    this.book.next()
+    const ok = this.book.next();
+    console.log(1, ok);
   }
 
   @HostListener('window:keydown.pageUp', ['$event'])
   @HostListener('contextmenu', ['$event']) onContextMenu() {
     this.config.scrollDirection = false;
-    this.book.prev();
+    const ok = this.book.prev();
+    console.log(ok);
   }
 
   @HostListener('window:mousewheel', ['$event']) onWheel(e) {

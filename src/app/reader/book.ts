@@ -65,9 +65,7 @@ export class Book {
   }
 
   private checkPage(page: number) {
-    if (page > 0 && page <= this.total) {
-      return true;
-    }
+      return page > 0 && page <= this.total;
   }
 
   updateCurrent(page: number): boolean {

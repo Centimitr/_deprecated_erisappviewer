@@ -180,9 +180,7 @@ export class Timeout {
     return new Promise<void>(resolve => {
       const since = time.Since(this.t);
       const d = since > delay ? 0 : delay - since;
-      console.log(since, d);
       setTimeout(() => {
-        console.log('1');
         resolve();
       }, d)
     });
