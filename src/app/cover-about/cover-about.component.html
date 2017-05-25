@@ -3,8 +3,19 @@
   <div>a convenient comic reader</div>
   <div class="info"><span>Version: 0.2.1 (18)</span><span class="blank">-</span><span><a (click)="showCredit()">Acknowledgement</a></span>
   </div>
+  <div class="info"><span><a (click)="showCredit()">Submit a Bug</a></span><span> | </span><span><a
+    (click)="showCredit()">Request a Feature</a></span></div>
   <div class="footer">2017 Eris Developer. All rights reserved.</div>
 </div>
-<div class="credit" [hidden]="!creditShow">
-  <a (click)="hideCredit()">Back</a>
+<div class="credit" *ngIf="creditShow">
+  <div style="height: 10000px;"></div>
+  <div class="box-wrapper">
+    <a style="text-decoration: none;" (click)="hideCredit()"><span style="margin: 0 4px;">←</span>Back</a>
+    <div class="box" style="">
+        <div *ngFor="let c of credits">
+          <div><a (click)="open(c.package.url)">{{c.package.name}}</a></div>
+          <div class="license">{{c.license}}</div>
+        </div>
+    </div>
+  </div>
 </div>

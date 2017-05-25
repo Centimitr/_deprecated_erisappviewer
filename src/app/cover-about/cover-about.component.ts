@@ -3,17 +3,18 @@ import credits from "./credits";
 @Component({
   selector: 'cover-about',
   templateUrl: './cover-about.component.html',
-  styleUrls: ['./cover-about.component.css']
+  styleUrls: ['./cover-about.component.css', './about.css', './credits.css']
 })
 export class CoverAboutComponent implements OnInit {
 
   private creditShow: boolean = false;
+  private credits: any[] = [];
 
   constructor() {
   }
 
   ngOnInit() {
-    const c = Object.keys(credits).map(k => credits[k]);
+    this.credits = credits;
   }
 
   showCredit() {
@@ -22,5 +23,9 @@ export class CoverAboutComponent implements OnInit {
 
   hideCredit() {
     this.creditShow = false;
+  }
+
+  open(url: string) {
+    console.log(url);
   }
 }

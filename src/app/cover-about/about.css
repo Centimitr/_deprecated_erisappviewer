@@ -1,0 +1,24 @@
+.about {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  margin: -12px 0;
+  width: 85%;
+}
+
+.blank {
+  opacity: 0;
+}
+
+.info {
+  font-size: 13px;
+}
+
+.footer {
+  font-size: 12px;
+  opacity: 0.62;
+}
