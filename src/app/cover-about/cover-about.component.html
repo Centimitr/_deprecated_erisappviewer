@@ -13,7 +13,7 @@
     <a style="text-decoration: none;" (click)="hideCredit()"><span style="margin: 0 4px;">←</span>Back</a>
     <div class="box" style="">
         <div *ngFor="let c of credits">
-          <div><a (click)="open(c.package.url)">{{c.package.name}}</a></div>
+          <div><a (click)="open(c.package.homepage)">{{c.package.name}}</a></div>
           <div class="license">{{c.license}}</div>
         </div>
     </div>
