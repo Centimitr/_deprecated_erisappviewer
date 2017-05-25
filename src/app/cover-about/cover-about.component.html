@@ -1,0 +1,10 @@
+<div class="about" *ngIf="!creditShow">
+  <img class="logo" src="../../assets/logo.png" alt="">
+  <div>a convenient comic reader</div>
+  <div class="info"><span>Version: 0.2.1 (18)</span><span class="blank">-</span><span><a (click)="showCredit()">Acknowledgement</a></span>
+  </div>
+  <div class="footer">2017 Eris Developer. All rights reserved.</div>
+</div>
+<div class="credit" [hidden]="!creditShow">
+  <a (click)="hideCredit()">Back</a>
+</div>

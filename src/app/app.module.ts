@@ -11,7 +11,10 @@ import {AppStorage} from "./lib/storage";
 import {ImageComponent} from "./image/image.component";
 import {ScrollComponent} from "./scroll/scroll.component";
 import {Config} from "./config.service";
-import { DotComponent } from './dot/dot.component';
+import {DotComponent} from './dot/dot.component';
+import {CoverAboutComponent} from './cover-about/cover-about.component';
+import {CoverLayerComponent} from './cover-layer/cover-layer.component';
+import {CoverPreferenceComponent} from './cover-preference/cover-preference.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +24,9 @@ import { DotComponent } from './dot/dot.component';
     ImageComponent,
     ScrollComponent,
     DotComponent,
+    CoverAboutComponent,
+    CoverLayerComponent,
+    CoverPreferenceComponent,
   ],
   imports: [
     BrowserModule,

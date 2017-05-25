@@ -43,7 +43,7 @@ export class ReaderComponent implements OnChanges {
       }
       this.ok.emit();
       await this.book.hasPageLoaded();
-      await t.timeout(998);
+      await t.timeout(375);
       this.loadingShow = false;
       this.title.setTitle(this.book.meta.Name);
 
@@ -241,6 +241,7 @@ export class ReaderComponent implements OnChanges {
 
   @HostListener('window:keydown.pageDown', ['$event'])
   @HostListener('click', ['$event']) onClick() {
+    if (this.loadingShow) return;
     this.config.scrollDirection = true;
     const ok = this.book.next();
     console.log(1, ok);
@@ -248,6 +249,7 @@ export class ReaderComponent implements OnChanges {
 
   @HostListener('window:keydown.pageUp', ['$event'])
   @HostListener('contextmenu', ['$event']) onContextMenu() {
+    if (this.loadingShow) return;
     this.config.scrollDirection = false;
     const ok = this.book.prev();
     console.log(ok);

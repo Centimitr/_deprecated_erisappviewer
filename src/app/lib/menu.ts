@@ -163,13 +163,13 @@ const getTemplate = function () {
         role: 'front'
       }
     ];
-    // if (1) {
-    //   template[4].submenu.push({
-    //     label: 'Developer Tools',
-    //     accelerator: 'Cmd+Alt+I',
-    //     role: 'toggledevtools'
-    //   });
-    // }
+    if (1) {
+      template[4].submenu.push({
+        label: 'Developer Tools',
+        accelerator: 'Cmd+Alt+I',
+        role: 'toggledevtools'
+      });
+    }
   }
   return Menu.buildFromTemplate(template);
 };
