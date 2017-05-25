@@ -1,4 +1,5 @@
 import {Injectable} from "@angular/core";
+import {CoverService} from "../cover-layer/cover.service";
 const electron = window['require']('electron');
 const {app, Menu, MenuItem, BrowserWindow} = electron.remote;
 const process = window['process'];
@@ -12,7 +13,7 @@ const alwaysOnTopItem = {
     item.checked = win.isAlwaysOnTop();
   }
 };
-const getTemplate = function () {
+const getTemplate = function (c) {
   const template: any = [
     {
       label: 'File',
@@ -39,25 +40,25 @@ const getTemplate = function () {
       role: 'help',
       submenu: [
         {
-          label: 'Learn More',
-          click () {
-            electron.shell.openExternal('http://erisapp.com');
-          }
-        }, {
-          label: 'Credits',
-          click(){
-            electron.shell.openExternal('http://erisapp.com/credits');
-          }
-        }, {
-          label: 'Feedback',
-          click(){
-            electron.shell.openExternal('http://erisapp.com/feedback');
-          }
-        }, {
-          label: 'Feature Request',
-          click(){
-            electron.shell.openExternal('http://erisapp.com/featurerequrest');
-          }
+          // label: 'Learn More',
+          // click () {
+          //   electron.shell.openExternal('http://erisapp.com');
+          // }
+          // }, {
+          //   label: 'Credits',
+          //   click(){
+          //     electron.shell.openExternal('http://erisapp.com/credits');
+          //   }
+          // }, {
+          //   label: 'Feedback',
+          //   click(){
+          //     electron.shell.openExternal('http://erisapp.com/feedback');
+          //   }
+          // }, {
+          //   label: 'Feature Request',
+          //   click(){
+          //     electron.shell.openExternal('http://erisapp.com/featurerequrest');
+          //   }
         }
       ]
     }
@@ -67,7 +68,10 @@ const getTemplate = function () {
       label: app.getName(),
       submenu: [
         {
-          role: 'about'
+          label: `About ${app.getName()}`,
+          click(){
+            c.showAbout();
+          }
         }, {
           type: 'separator'
         },
@@ -182,7 +186,12 @@ export {
 
 @Injectable()
 export class AppMenu {
-  current: any = getTemplate();
+
+  constructor(private c: CoverService) {
+
+  }
+
+  current: any = getTemplate(this.c);
 
   get() {
     return this.current;
@@ -209,7 +218,7 @@ export class AppMenu {
   }
 
   reset() {
-    this.current = getTemplate();
+    this.current = getTemplate(this.c);
     this.set();
   }
 }

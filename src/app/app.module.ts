@@ -15,6 +15,7 @@ import {DotComponent} from './dot/dot.component';
 import {CoverAboutComponent} from './cover-about/cover-about.component';
 import {CoverLayerComponent} from './cover-layer/cover-layer.component';
 import {CoverPreferenceComponent} from './cover-preference/cover-preference.component';
+import {CoverService} from "./cover-layer/cover.service";
 
 @NgModule({
   declarations: [
@@ -33,7 +34,7 @@ import {CoverPreferenceComponent} from './cover-preference/cover-preference.comp
     FormsModule,
     HttpModule
   ],
-  providers: [AppMenu, AppStorage, Config],
+  providers: [CoverService, AppMenu, AppStorage, Config],
   bootstrap: [AppComponent]
 })
 export class AppModule {

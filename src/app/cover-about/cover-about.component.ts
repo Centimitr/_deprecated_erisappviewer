@@ -26,6 +26,6 @@ export class CoverAboutComponent implements OnInit {
   }
 
   open(url: string) {
-    console.log(url);
+    window['require']('electron').shell.openExternal(url);
   }
 }

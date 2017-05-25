@@ -1,2 +1,2 @@
-<div class="backdrop show"></div>
-<cover-about></cover-about>
+<div class="backdrop" [class.show]="s.backdropShow" (click)="s.dismissAll()"></div>
+<cover-about [class.show]="s.states.about"></cover-about>

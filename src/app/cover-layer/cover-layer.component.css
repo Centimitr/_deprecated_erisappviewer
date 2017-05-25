@@ -12,6 +12,7 @@
   font-family: "Sukhumvit Set", sans-serif;
   line-height: 32px;
   font-size: 14px;
+  pointer-events: none;
 }
 
 .backdrop {
@@ -24,10 +25,13 @@
   opacity: 0;
   transition: 375ms;
   z-index: -1;
+  pointer-events: none;
 }
 
 .backdrop.show {
-  opacity: .32;
+  pointer-events: auto;
+  opacity: .62;
+
 }
 
 cover-about, cover-preference {
@@ -41,9 +45,16 @@ cover-about, cover-preference {
   min-width: 320px;
   max-width: 570px;
   max-height: 85%;
-  transition: 275ms;
+  transition: 75ms ease-in;
+  opacity: 0;
+  pointer-events: none;
 }
 
-cover-about{
+cover-about.show, cover-preference.show {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+cover-about {
   max-width: 480px;
 }
