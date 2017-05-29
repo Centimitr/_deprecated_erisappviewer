@@ -1,0 +1,18 @@
+<div class="title">Preferences</div>
+<div class="reset" [hidden]="!canReset()"><a (click)="reset()">reset</a></div>
+<section class="main">
+  <table>
+    <tr>
+        <td class="name">RAR Passwords:</td>
+        <td class="value"><input type="text" title="" [(ngModel)]="c.rarPasswords" (blur)="save()"></td>
+    </tr>
+    <tr>
+      <td colspan="2" class="name">
+        <label>
+          <input type="checkbox" [(ngModel)]="c.submitData" (change)="save()">
+          Help Eris improve by submitting anonymous data
+        </label>
+      </td>
+    </tr>
+  </table>
+</section>

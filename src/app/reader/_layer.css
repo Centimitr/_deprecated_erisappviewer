@@ -10,11 +10,10 @@
 .layer .panel {
   position: absolute;
   background-color: #111;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid #222;
-  color: #aaa;
-  padding: 8px 12px 8px 12px;
-  font-family: "PingFang SC", sans-serif;
+  color: #bbb;
+  padding: 6px 10px 6px 10px;
   text-shadow: 0 0 2px black;
   font-size: 16px;
 }
@@ -52,6 +51,6 @@
 }
 
 .loading .word {
-  font-size: 38px;
+  font-size: 32px;
   color: #444;
 }

@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {CoverService} from "../cover-layer/cover.service";
+import {CoverService} from "../cover/cover-layer/cover.service";
 const electron = window['require']('electron');
 const {app, Menu, MenuItem, BrowserWindow} = electron.remote;
 const process = window['process'];
@@ -50,15 +50,15 @@ const getTemplate = function (c) {
           //     electron.shell.openExternal('http://erisapp.com/credits');
           //   }
           // }, {
-          //   label: 'Feedback',
-          //   click(){
-          //     electron.shell.openExternal('http://erisapp.com/feedback');
-          //   }
-          // }, {
-          //   label: 'Feature Request',
-          //   click(){
-          //     electron.shell.openExternal('http://erisapp.com/featurerequrest');
-          //   }
+          label: 'Feedback',
+          click(){
+            electron.shell.openExternal('mailto:centimitr@gmail.com?subject=[Feedback] &body=Thank you for your feedback!');
+          }
+        }, {
+          label: 'Feature Request',
+          click(){
+            electron.shell.openExternal('mailto:centimitr@gmail.com?subject=[Feature Request] &body=Thank you for your feedback!');
+          }
         }
       ]
     }
@@ -71,6 +71,12 @@ const getTemplate = function (c) {
           label: `About ${app.getName()}`,
           click(){
             c.showAbout();
+          }
+        }, {
+          label: `Preferences...`,
+          accelerator: 'CmdOrCtrl+,',
+          click(){
+            c.showPreferences();
           }
         }, {
           type: 'separator'
@@ -167,13 +173,13 @@ const getTemplate = function (c) {
         role: 'front'
       }
     ];
-    // if (1) {
-    //   template[4].submenu.push({
-    //     label: 'Developer Tools',
-    //     accelerator: 'Cmd+Alt+I',
-    //     role: 'toggledevtools'
-    //   });
-    // }
+    if (1) {
+      template[4].submenu.push({
+        label: 'Developer Tools',
+        accelerator: 'Cmd+Alt+I',
+        role: 'toggledevtools'
+      });
+    }
   }
   return Menu.buildFromTemplate(template);
 };

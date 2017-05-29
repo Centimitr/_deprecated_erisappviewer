@@ -6,8 +6,17 @@
   box-sizing: border-box;
   user-select: none;
   -webkit-user-drag: none;
-  font-family: "PingFang SC", sans-serif;
+  font-family: "Sukhumvit Set", "PingFang SC", sans-serif;
   cursor: default;
+}
+
+a {
+  color: rgb(3, 102, 214);
+  cursor: pointer;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 body {
@@ -15,20 +24,20 @@ body {
 }
 
 /*body.bg-tran-d-l {*/
-  /*background-color: #dedede;*/
-  /*animation: bg-tran 375ms;*/
+/*background-color: #dedede;*/
+/*animation: bg-tran 375ms;*/
 /*}*/
 /**/
 /*@keyframes bg-tran {*/
-  /*0% {*/
-    /*opacity: 0;*/
-  /*}*/
-  /*62% {*/
-    /*opacity: 1;*/
-  /*}*/
-  /*100% {*/
-    /*opacity: 0*/
-  /*}*/
+/*0% {*/
+/*opacity: 0;*/
+/*}*/
+/*62% {*/
+/*opacity: 1;*/
+/*}*/
+/*100% {*/
+/*opacity: 0*/
+/*}*/
 /*}*/
 
 canvas {

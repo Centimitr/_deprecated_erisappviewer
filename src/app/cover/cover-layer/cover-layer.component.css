@@ -9,7 +9,6 @@
   flex-flow: row nowrap;
   align-items: center;
   justify-content: center;
-  font-family: "Sukhumvit Set", sans-serif;
   line-height: 32px;
   font-size: 14px;
   pointer-events: none;
@@ -23,7 +22,7 @@
   left: 0;
   background-color: black;
   opacity: 0;
-  transition: 375ms;
+  transition: 50ms ease-out;
   z-index: -1;
   pointer-events: none;
 }
@@ -34,7 +33,7 @@
 
 }
 
-cover-about, cover-preference {
+cover-about, cover-preferences {
   background-color: white;
   border-radius: 6px;
   border: 1px solid #888;
@@ -45,12 +44,12 @@ cover-about, cover-preference {
   min-width: 320px;
   max-width: 570px;
   max-height: 85%;
-  transition: 75ms ease-in;
+  transition: 125ms ease-in-out;
   opacity: 0;
   pointer-events: none;
 }
 
-cover-about.show, cover-preference.show {
+cover-about.show, cover-preferences.show {
   pointer-events: auto;
   opacity: 1;
 }

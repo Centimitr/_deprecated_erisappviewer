@@ -1,6 +1,9 @@
 import {Injectable, NgZone} from '@angular/core';
 const electron = window['require']('electron');
 const {getCurrentWindow} = electron.remote;
+const forEach = (obj: object) => {
+  return Object.keys(obj).map(k => ({k: k, v: obj[k]}))
+};
 
 @Injectable()
 export class CoverService {
@@ -8,6 +11,7 @@ export class CoverService {
   backdropShow: boolean = false;
   states: any = {
     about: false,
+    preferences: false,
   };
   r: Function;
 
@@ -20,13 +24,23 @@ export class CoverService {
   private _show(name: string) {
     this.r(() => {
       getCurrentWindow().show();
-      this.states[name] = true;
       this.backdropShow = true;
+      const showing = forEach(this.states).filter(kv => kv.v).pop();
+      let timeout = 0;
+      if (showing && showing.k != name) {
+        this.states[showing.k] = false;
+        timeout = 150;
+      }
+      setTimeout(() => this.states[name] = true, timeout)
     });
   }
 
   showAbout() {
     this._show('about');
+  }
+
+  showPreferences() {
+    this._show('preferences');
   }
 
   dismissAll() {
