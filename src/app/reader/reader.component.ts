@@ -35,7 +35,7 @@ export class ReaderComponent implements OnChanges {
       this.book = null;
       this.loadingShow = true;
       const t = new Timeout();
-      this.book = new Book(this.path, this.config);
+      this.book = new Book(this.path, this.config, this.s);
       let e = await this.book.init();
       if (e) {
         this.fail.emit(e);

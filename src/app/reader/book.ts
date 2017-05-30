@@ -3,6 +3,7 @@ import args from "../lib/args";
 import {Config} from "../config.service";
 import {ImageComponent} from "../image/image.component";
 import {get} from "../lib/get";
+import {AppStorage} from "../lib/storage";
 const getSubBookNames = function (pms: PageMeta[]) {
   const m = new Map();
   pms.forEach(pm => m.set(pm.SubBook, 1));
@@ -17,7 +18,7 @@ export class Book {
   total: number;
   _onPage: Function[] = [];
 
-  constructor(path: string, private config: Config) {
+  constructor(path: string, private config: Config, private s: AppStorage) {
     this.locator = path;
   }
 
@@ -39,7 +40,10 @@ export class Book {
 
   async init(): Promise<any> {
     await args.wait();
-    const data = await get(`http://localhost:${args.port}/book`, {locator: this.locator});
+    const data = await get(`https://localhost:${args.port}/book`, {
+      locator: this.locator,
+      keys: this.s.get('preferences.config').get().rarPasswords
+    });
     this.meta = await data.json();
     if (!this.meta.Pages || !this.meta.Pages.length) {
       return 'Sorry, no book found in this folder.';
@@ -65,7 +69,7 @@ export class Book {
   }
 
   private checkPage(page: number) {
-      return page > 0 && page <= this.total;
+    return page > 0 && page <= this.total;
   }
 
   updateCurrent(page: number): boolean {
@@ -106,9 +110,10 @@ export class Book {
   }
 
   getPageFilePath(imgLocator: string) {
-    const url = new URL(`http://localhost:${args.port}/book/page`);
+    const url = new URL(`https://localhost:${args.port}/book/page`);
     url['searchParams'].append('locator', this.locator);
     url['searchParams'].append('page', imgLocator);
+    url['searchParams'].append('keys', this.s.get('preferences.config').get().rarPasswords);
     return url.href;
   }
 

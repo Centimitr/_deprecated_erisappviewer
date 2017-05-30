@@ -8,7 +8,7 @@ const equal = function (base: object, toCheck: object): boolean {
 };
 const DEFAULT_CONFIG = {
   submitData: true,
-  rarPasswords: 'qwertyuiop ⑨ 扶她奶茶'
+  rarPasswords: '⑨ qwertyuiop 扶她奶茶'
 };
 
 @Component({

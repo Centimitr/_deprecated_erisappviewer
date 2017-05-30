@@ -21,16 +21,18 @@
   bottom: 0;
   left: 0;
   background-color: black;
-  opacity: 0;
-  transition: 50ms ease-out;
+  /*backdrop-filter: saturate(180%) blur(10px);*/
+  display: flex;
+
   z-index: -1;
   pointer-events: none;
+  /*transition: opacity 25ms;*/
+  opacity: 0;
 }
 
 .backdrop.show {
   pointer-events: auto;
-  opacity: .62;
-
+  opacity: .75;
 }
 
 cover-about, cover-preferences {
@@ -45,13 +47,13 @@ cover-about, cover-preferences {
   max-width: 570px;
   max-height: 85%;
   transition: 125ms ease-in-out;
-  opacity: 0;
   pointer-events: none;
+  display: none;
 }
 
 cover-about.show, cover-preferences.show {
   pointer-events: auto;
-  opacity: 1;
+  display: block;
 }
 
 cover-about {

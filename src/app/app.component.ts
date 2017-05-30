@@ -82,11 +82,10 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
-
     await args.wait();
     const path = args.path;
     if (!path) {
-      await this.open();
+      // await this.open();
     } else {
       this.path = path;
       await this.whenOpen();
