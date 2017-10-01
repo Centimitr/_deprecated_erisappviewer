@@ -1,3 +1,4 @@
+import {Injectable} from "@angular/core";
 export interface KeyValue<T, U> {
   key: T;
   value: U;
@@ -39,6 +40,7 @@ export class AppStorageValue {
   }
 }
 
+@Injectable()
 export class AppStorage {
   m = new Map<string, AppStorageValue>();
   s = window.localStorage;
